@@ -45,6 +45,7 @@ urlpatterns = [
     path('<int:id>', views.update_details, name='update_details'),
     path('details_doctor', views.details_doctor, name='details_doctor'),
     path('view_receipt/<id>', views.view_receipt, name='view_receipt'),
+    path('view_receipts', views.view_receipts, name='view_receipts'),
     # path('generate_pdf', views.generate_pdf, name='generate_pdf'),
     path('doctor_register', views.doctor_register, name='doctor_register'),
     path('<int:id>', views.update_doctor, name='update_doctor'),

@@ -680,6 +680,51 @@ def view_receipt(request,id):
     p.save()
 
     return response
+def view_receipts(request):
+    data = Booking.objects.get()
+    # Get the booking details from the request
+    doc_name_id = data.doc_name_id
+    booking_date = data.booking_date
+    booked_on = data.booked_on
+    time_slot_id = data.time_slot_id
+    description = data.description
+    print(doc_name_id )
+    doctor=Doctors.objects.get(id=doc_name_id)
+    time_slot = Time_slot.objects.get(id=time_slot_id)
+
+    # Create a booking object with the details
+    booking = Booking(doc_name_id=doctor,booked_on =booked_on,
+                      booking_date=booking_date, time_slot_id=time_slot,
+                      description=description)
+
+    # Create a PDF file object
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="booking.pdf"'
+
+    # Create a canvas object and write the PDF content
+    p = canvas.Canvas(response)
+
+    p.setFillColorRGB(0.5, 0.5, 1)  # Set background color to light blue
+    p.rect(0, 0, 612, 1000, fill=True)  # Draw a rectangle to fill the entire page
+
+    p.setFont("Helvetica-Bold", 36)  # Set font type and size
+    p.setFillColorRGB(0, 0, 0)  # Set text color to red
+    p.drawString(100, 750, "Receipt")  # Draw the "Receipt" text
+    p.setFont("Helvetica-Bold", 12)  # Set font type and size for the remaining text
+    p.setFillColorRGB(0, 0, 0)  # Set text color to black
+    p.drawString(100, 700, f"Patient Name: Maaya Krishna")
+    p.drawString(100, 650, f"Doctor: {booking.doc_name_id}")
+    p.drawString(100, 600, f"Booking date: {booking.booking_date}")
+    p.drawString(100, 550, f"Booked on: {booking.booked_on}")
+    p.drawString(100, 500, f"Time slot: {booking.time_slot_id}")
+    p.drawString(100, 450, f"Description: {booking.description}")
+    p.drawString(100, 400, f"Fee: 120/-")
+    p.drawString(100, 350, f"Payment Status: Success")
+    p.showPage()
+    p.save()
+
+    return response
+
 
 
 class patient_form(View):
