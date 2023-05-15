@@ -1,0 +1,108 @@
+{% load static %}
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dental Veneers Service</title>
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+
+  <style>
+    /* Basic styling for the page */
+    body {
+      background-color: #A9CCE3;
+      font-family: Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Styling for the header */
+    header {
+      background-color: #0077be;
+      color: #fff;
+      padding: 20px;
+    }
+
+    /* Styling for the main content */
+    main {
+      margin: 20px;
+    }
+
+    /* Styling for the images */
+    img {
+      max-width: 100%;
+    }
+
+    /* Styling for the pricing table */
+    table {
+      border-collapse: collapse;
+      margin-top: 20px;
+      width: 100%;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #0077be;
+      color: #fff;
+    }
+
+    /* Styling for the features list */
+    ul {
+      margin-top: 20px;
+      padding-left: 20px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Dental Veneers Service</h1>
+  </header>
+
+  <main>
+    <h2>Description</h2>
+    <p>
+      Dental veneers are a cosmetic dentistry treatment that can improve the appearance of your teeth. A veneer is a thin shell made of porcelain or composite resin that is bonded to the front of a tooth. Veneers can be used to cover stains, chips, gaps, or misshapen teeth, and can also improve the alignment and symmetry of your smile.
+    </p>
+
+    <h2>Images</h2>
+
+     <img src="{% static 'images/dv1.jpg' %}"  width="400" height="300">
+
+    <img src="{% static 'images/dv2.jpg' %}" alt="Before bonding" width="500" height="300">
+
+
+    <h2>Features</h2>
+    <ul>
+      <li>Can improve the appearance of stained, chipped, gapped or misshapen teeth</li>
+      <li>Can improve the alignment and symmetry of your smile</li>
+      <li>Can be made of porcelain or composite resin</li>
+    </ul>
+
+    <h2>Pricing</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Service</th>
+          <th>Price</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Dental Veneers Service</td>
+          <td>$800 - $2,500 per tooth</td>
+        </tr>
+      </tbody>
+    </table>
+     <div class="button2">
+      <a href="{% url 'booking' %}">
+        <button type="submit" onclick="login" name="submit" class="btn btn-warning" style="text-align: center;font-size:32px;background-color:#fcb13b; color:rgba(0, 0, 0, 0.87);padding:10px;border:none;  box-shadow: 0 2px 4px rgba(0, 0, 0, .6);">
+              Book Your Appointment</button> </a>
+    </div>
+  </main>
+</body>
+</html>

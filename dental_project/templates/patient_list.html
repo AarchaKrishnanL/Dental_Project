@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+   <div class="col-sm-4">
+  <h1>{% if form.instance.pk %}Update{% else %}Create{% endif %} Patient</h1>
+<!--  <h4 class="text-center alert alert-info">Add Details</h4>-->
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <a href="{% url 'patient_list' %}">
+      <button type="submit">{% if form.instance.pk %}Update{% else %}Create{% endif %}</button></a>
+  </form>
+   </div>
+
+<div class="col-sm-7 offset-1">
+  <h1 class="text-center alert alert-info">Patient Details</h1>
+  {% if patients %}
+   <table class="table table-hover">
+    <thead>
+      <tr>
+        <th scope="col">ID</th>
+        <th scope="col">Blood Group</th>
+        <th scope="col">Gender</th>
+        <th scope="col">Date of Birth</th>
+        <th scope="col">Address</th>
+        <th scope="col">Allergies</th>
+        <th scope="col">Records</th>
+        <th scope="col">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+        {% for patient in patients %}
+        <tr>
+          <th scope="row">{{ patient.id }}</th>
+          <th>{{ patient.bloodgroup }}</th>
+          <th>{{ patient.gender }}</th>
+          <th>{{ patient.dob }}</th>
+          <th>{{ patient.address }}</th>
+          <th>{{ patient.allergies }}</th>
+          <th><a href="{{ patient.records.url }}">{{ patient.records.name }}</a></th>
+          <td>
+            <a href="{% url 'patient_update' patient.id %}" class="btn btn-warning btn-sm">Edit</a>
+            <a href="{% url 'patient_delete' patient.id %}" class="btn btn-warning btn-sm">Delete</a>
+          </td>
+        </tr>
+       {% endfor %}
+    </tbody>
+  </table>
+    {% else %}
+      <h4 class="text-center alert alert-info"></h4>
+    {% endif %}
+</div>
+</div>
+{% endblock %}

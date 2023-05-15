@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+  {% if services %}
+
+    <div class="row">
+
+      {% for service in services %}
+
+        <div class="col-sm-4">
+          <div class="card">
+            <img src="{{ service.ser_image.url }}" class="card-img-top" alt="{{ service.ser_name }}">
+            <div class="card-body">
+              <h5 class="card-title">{{ service.ser_name }}</h5>
+              <p class="card-text">{{ service.ser_description }}</p>
+              <a href="#" class="btn btn-primary">Learn More</a>
+            </div>
+          </div>
+        </div>
+
+      {% endfor %}
+
+    </div>
+
+  {% else %}
+    <p>No services found matching "{{ query }}".</p>
+  {% endif %}
+
+{% endblock %}
