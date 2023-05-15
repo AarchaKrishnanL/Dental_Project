@@ -57,9 +57,11 @@
          <th scope="col">Patient Name</th>
         <th scope="col">Booking Date</th>
         <th scope="col">Slot</th>
+        <th scope="col">Description</th>
          <th scope="col">Details</th>
         <th scope="col">Payment Status</th>
         <th scope="col">Appointment Status</th>
+        <th scope="col">Report</th>
 
 
 
@@ -72,13 +74,20 @@
         <td>Maaya Krishna</td>
         <td>{{i.booking_date}}</td>
         <td>{{i.time_slot}}</td>
+        <td>{{i.description}}</td>
         <td>
-            <a href="{% url 'booking' %}">
+            <a href="{% url 'booking'  %}">
         <button type="submit" onclick="login" name="submit" class="btn btn-warning" style="text-align: center;font-size:10px;background-color:#fcb13b; color:rgba(0, 0, 0, 0.87);padding:10px;border:none;  box-shadow: 0 2px 4px rgba(0, 0, 0, .6);">
               VIEW</button> </a>
         </td>
         <td><i class="fa fa-check-square" style="font-size:30px;color:green"></i></td>
         <td> <button id="myButton" onclick="changeTextAndColor()">Pending!!</button></td>
+        <td>
+            <a href="{% url 'view_receipt' i.id %}" >
+<button type="submit" onclick="login" name="receiptdownload" class="btn btn-warning" style="text-align: center;font-size:10px;background-color:#fcb13b; color:rgba(0, 0, 0, 0.87);padding:10px;border:none;  box-shadow: 0 2px 4px rgba(0, 0, 0, .6);">
+              DOWNLOAD</button> </a>
+
+        </td>
     <!--<td><span class="badge text-bg-dark">{{i.status}}</span></td>!-->
 <!--        <td>-->
 <!--            <a href="{% url 'update_booking' %}" class="edit" data-toggle="modal">-->

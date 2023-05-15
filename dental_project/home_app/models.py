@@ -1,3 +1,5 @@
+import uuid
+
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import AbstractUser
 from django.db import models
@@ -8,15 +10,6 @@ from django.core.validators import RegexValidator, MinValueValidator, MaxValueVa
 from django.contrib.auth.models import User
 
 # Create your models here.
-
-# class User(AbstractUser):
-#     is_admin= models.BooleanField('Is admin',default=False)
-#     is_patient = models.BooleanField('Is patient', default=False)
-#     is_doctor = models.BooleanField('Is doctor', default=False)
-
-
-
-
 
 class CustomUser(AbstractBaseUser):
     first_name = models.CharField(max_length=30)
@@ -97,84 +90,85 @@ class Patients(models.Model):
         ('AB-', 'AB-'),
     ]
 
-    # SUPPLEMENTS_CHOICES = [
-    #     ('Multivitamin', 'Multivitamin'),
-    #     ('Omega3', 'Omega3'),
-    #     ('VitaminD / D3', 'VitaminD / D3'),
-    #     ('BComplex', 'BComplex'),
-    #     ('Zinc', 'Zinc'),
-    #     ('Folic Acid', 'Folic Acid'),
-    #     ('Melatonin', 'Melatonin'),
-    #     ('BComplex', 'BComplex'),
-    #     ('Biotin', 'Biotin'),
-    #     ('Coenzyme', 'Coenzyme'),
-    #     ('Other', 'Other'),
-    #     ('None', 'None'),
-    #
-    # ]
+    SUPPLIMENT_CHOICES = [
+        ('Multivitamin','Multivitamin'),
+        ('Omega3', 'Omega3'),
+        ('Vitamin3', 'Vitamin3'),
+        ('BComplex', 'BComplex'),
+        ('Vitamin D/D3', 'Vitamin D/D3'),
+        ('Zinc', 'Zinc'),
+        ('Folic Acid', 'Folic Acid'),
+        ('Melatonin', 'Melatonin'),
+        ('Biotin', 'Biotin'),
+        ('Coenzyme', 'Coenzyme'),
+        ('None', 'None'),
+        ('Other', 'Other'),
+    ]
+
+    ISSUES_CHOICES = [
+        ('Hormone Imbalance','Hormone Imbalance'),
+        ('Asthma', 'Asthma'),
+        ('Cancer/Systemic disease', 'Cancer/Systemic disease'),
+        ('Epilepsy/Seizure', 'Epilepsy/Seizure'),
+        ('High Blood Pressure', 'High Blood Pressure'),
+        ('Diabetes', 'Diabetes'),
+        ('Heart Problems', 'Heart Problems'),
+        ('HIV/AIDS', 'HIV/AIDS'),
+        ('Auto immune Disorder', 'Auto immune Disorder'),
+        ('Depression', 'Depression'),
+        ('HeadAches/Migrations', 'HeadAches/Migrations'),
+        ('Other', 'Other'),
+        ('None', 'None'),
+    ]
+
+    ALLERGY_CHOICES = [
+        ('Aspirin','Aspirin'),
+        ('Shellfish', 'Shellfish'),
+        ('Tree Nuts', 'Tree Nuts'),
+        ('Iodine', 'Iodine'),
+        ('Latex', 'Latex'),
+        ('Dairy', 'Dairy'),
+        ('Fruits', 'Fruits'),
+        ('Vegetables', 'Vegetables'),
+        ('Other', 'Other'),
+        ('None', 'None'),
+    ]
+
+    SMOKER_CHOICES = [
+        ('yes','yes'),
+        ('no', 'no'),
+    ]
+    BEVARAGE_CHOICES = [
+        ('yes', 'yes'),
+        ('no', 'no'),
+    ]
+    CLAUSTROPHOBIC_CHOICES = [
+        ('yes', 'yes'),
+        ('no', 'no'),
+    ]
+    PAIN_CHOICES = [
+        ('low', 'low'),
+        ('medium', 'medium'),
+        ('high','high'),
+    ]
 
     gender = models.CharField(max_length=6, choices=GENDER_CHOICES,null=True,blank=True)
     blood_group = models.CharField(max_length=3, choices=BLOOD_GROUP_CHOICES,null=True,blank=True)
-    date_of_birth = models.DateField(null=True,blank=True)
+    date_of_birth = models.DateField(auto_now=False,auto_now_add=False,null=True,blank=True)
     previous_report = models.FileField(upload_to='previous_reports/',null=True,blank=True)
-    # supplements = MultiSelectField(choices=SUPPLEMENTS_CHOICES,blank=True, null=True)
-    supplements = models.TextField(blank=True,null=True)
-    health_issues = models.TextField(blank=True, null=True)
-    allergies = models.TextField(blank=True,null=True)
-    medications = models.TextField(blank=True,null=True)
-    smoker = models.TextField(blank=True,null=True)
-    beverages = models.TextField(blank=True,null=True)
-    claustrophobic = models.TextField(blank=True,null=True)
-    pain = models.TextField(blank=True,null=True)
-    photo1 = models.TextField(blank=True,null=True)
-    photo2 = models.TextField(blank=True,null=True)
-    photo3 = models.TextField(blank=True,null=True)
+    supplements = models.CharField(choices=SUPPLIMENT_CHOICES,max_length=50,blank=True,null=True)
+    health_issues = models.CharField(choices=ISSUES_CHOICES,max_length=50,blank=True, null=True)
+    allergies = models.CharField(choices=ALLERGY_CHOICES,max_length=50,blank=True,null=True)
+    smoker = models.CharField(choices=SMOKER_CHOICES,max_length=50,blank=True,null=True)
+    beverages = models.CharField(choices=BEVARAGE_CHOICES,max_length=50,blank=True,null=True)
+    claustrophobic = models.CharField(choices=CLAUSTROPHOBIC_CHOICES,max_length=50,blank=True,null=True)
+    pain = models.CharField(choices=PAIN_CHOICES,max_length=50,blank=True,null=True)
+    photo1 = models.ImageField(upload_to='photos/',blank=True,null=True)
+    photo2 = models.ImageField(upload_to='photos/',blank=True,null=True)
+    photo3 = models.ImageField(upload_to='photos/',blank=True,null=True)
 
-    def __str__(self):
-        return self.gender + self.blood_group + self.date_of_birth
 
-#
-# class Patients(models.Model):
-#     GENDER_CHOICES = [
-#         ('female', 'Female'),
-#         ('male', 'Male'),
-#         ('other', 'Other'),
-#     ]
-#     BLOOD_GROUP_CHOICES = [
-#         ('O+', 'O+'),
-#         ('A+', 'A+'),
-#         ('B+', 'B+'),
-#         ('AB+', 'AB+'),
-#         ('O-', 'O-'),
-#         ('A-', 'A-'),
-#         ('B-', 'B-'),
-#         ('AB-', 'AB-'),
-#     ]
-#     gender = models.CharField(max_length=6, choices=GENDER_CHOICES,null=True,blank=True)
-#     blood_group = models.CharField(max_length=3, choices=BLOOD_GROUP_CHOICES,null=True,blank=True)
-#     date_of_birth = models.DateTimeField(null=True,blank=True)
-#     previous_report = models.FileField(upload_to='reports/',null=True,blank=True)
-#     multivitamin = models.BooleanField(default=False,null=True,blank=True)
-#     omega3 = models.BooleanField(default=False,null=True,blank=True)
-#     vitamin3 = models.BooleanField(default=False,null=True,blank=True)
-#     b_complex = models.BooleanField(default=False,null=True,blank=True)
-#     vitamin_d = models.BooleanField(default=False,null=True,blank=True)
-#     zinc = models.BooleanField(default=False,null=True,blank=True)
-#     folic_acid = models.BooleanField(default=False,null=True,blank=True)
-#     melatonin = models.BooleanField(default=False,null=True,blank=True)
-#     biotin = models.BooleanField(default=False,null=True,blank=True)
-#     coenzyme = models.BooleanField(default=False,null=True,blank=True)
-#     other_supplements = models.CharField(max_length=100, blank=True,null=True)
-#     hormone_imbalance = models.BooleanField(default=False,null=True,blank=True)
-#     asthma = models.BooleanField(default=False,null=True,blank=True)
-#     cancer_systemic_disease = models.BooleanField(default=False,null=True,blank=True)
-#     epilepsy_seizure = models.BooleanField(default=False,null=True,blank=True)
-#     heart_disease = models.BooleanField(default=False,null=True,blank=True)
-#     high_blood_pressure = models.BooleanField(default=False,null=True,blank=True)
-#     kidney_disease = models.BooleanField(default=False,null=True,blank=True)
-#     liver_disease = models.BooleanField(default=False,null=True,blank=True)
-#     thyroid_disorder = models.BooleanField(default=False,null=True,blank=True)
-#     other_health_conditions = models.CharField(max_length=100, blank=True,null=True)
+
 
 
 
@@ -255,33 +249,7 @@ class Update_Booking(models.Model):
         return self.booked_on
 
 
-class Category(models.Model):
-    name = models.TextField(max_length=200,null=True,blank=True)
-    description = models.TextField(blank=True)
 
-class SubCategory(models.Model):
-    name = models.TextField(max_length=200,null=True,blank=True)
-    category = models.ForeignKey(Category,on_delete=models.CASCADE)
 
-class Product(models.Model):
-    name = models.TextField(max_length=200,null=True,blank=True)
-    category = models.ForeignKey(Category,on_delete=models.CASCADE)
-    subcategory = models.ForeignKey(SubCategory,on_delete=models.CASCADE)
-    price = price = models.DecimalField(max_digits=10, decimal_places=2)
-    description = models.TextField(blank=True)
-    quantity =  quantity = models.PositiveIntegerField()
-    weight = models.DecimalField(max_digits=6, decimal_places=2)
-    color = models.TextField(blank=True)
-    image = image = models.ImageField(upload_to='product_images/')
 
-class Cart(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    product_qty = models.PositiveIntegerField(default=0)
 
-    def _str_(self):
-        return str(self.user)
-
-    def get_product_price(self):
-        price = self.product_qty * self.product.price
-        return price

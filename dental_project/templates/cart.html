@@ -1,310 +1,241 @@
 {% extends 'base.html' %}
-
-{% block title%}
-Doctors
-{% endblock %}
-
-{%block content%}
-
-{%for cart in cart_all %}
-                    <div class="row mb-5 d-flex justify-content-between align-items-center">
-                      <div class="col-md-2 col-lg-2 col-xl-2">
-                        <img
-                          src="{{cart.product.image.url }}"
-                          class="img-fluid rounded-3" alt="Cotton T-shirt">
-                      </div>
-                      <div class="col-md-3 col-lg-3 col-xl-2">
-
-                        <h6 class="text-black mb-0">{{cart.product.name}}</h6>
-                      </div>
-                      <div class="col-md-3 col-lg-3 col-xl-2">
-
-                        <h6 class="text-black mb-0">Rs.{{cart.product.price}}</h6>
-                      </div>
-
-                      <div class="col-md-3 col-lg-3 col-xl-2 d-flex">
-                        <button class="btn btn-link px-2"
-                          onclick="this.parentNode.querySelector('input[type=number]').stepDown()">
-                          <a data-min="1" href="{% url 'minusqty' cart.id %}"><i class="fa fa-minus"></i></a>
-                        </button>
-
-                        <input id="form1" min="0" name="quantity" value="{{cart.product_qty}}" type="text"
-                          style="width:40px" readonly />
-
-                        <button class="btn btn-link px-2"
-                          onclick="this.parentNode.querySelector('input[type=number]').stepUp()">
-                          <a data-max="1000" href="{% url 'plusqty' cart.id %}"><i class="fa fa-plus"></i></a>
-
-                        </button>
-                      </div>
-
-                      <div class="col-md-3 col-lg-2 col-xl-2 offset-lg-1">
-                        <h6 class="mb-0">Rs {{cart.get_product_price}}</h6>
-                      </div>
-                      <div class="col-md-1 col-lg-1 col-xl-1 text-end">
-                        <a href="{% url 'de_cart' cart.id %}" class="text-muted"><i class="fas fa-times"></i></a>
-                      </div>
-                    </div>
-
-                    <hr class="my-4">
-
-                 {% endfor%}
+{% load static %}
+{% block content %}
+	<html lang="en">
+<head>
+<!-- Required meta tags -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css" integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" integrity="sha512-PgQMlq+nqFLV4ylk1gwUOgm6CtIIXkKwaIHp/PAIWHzig/lKZSEGKEysh0TCVbHJXCLN7WetD8TFecIky75ZfQ==" crossorigin="anonymous" />
+<link rel="stylesheet" type="text/css" href="{% static 'store/main.css' %}">
+<title>Cart</title>
+</head>
+<body class="bg-light">
+<div class="container-fluid">
+<div class="row">
+<div class="col-md-10 col-11 mx-auto">
+<div class="row mt-5 gx-3">
+<!-- left side div -->
+<div class="col-md-12 col-lg-8 col-11 mx-auto main_cart mb-lg-0 mb-5 shadow">
+<div class="card p-4">
+<h2 class="py-4 font-weight-bold">{{order.get_cart_items}}</h2>
+<div class="row">
+<!-- cart images div -->
+	{% for item in items %}
+<div class="col-md-5 col-11 mx-auto bg-light d-flex justify-content-center align-items-center shadow product_img">
+<img src="{{item.product.imageURL}}" class="img-fluid" alt="cart img">
+</div>
 
 
+<!-- cart product details -->
+<div class="col-md-7 col-11 mx-auto px-4 mt-2">
+<div class="row">
+<!-- product name  -->
+<div class="col-6 card-title">
+<h1 class="mb-4 product_name">{{item.product.Product_name}}</h1>
+<p class="mb-2">PRICE:{{item.product.price|floatformat:2}}$</p>
+<p class="mb-3">EXPIRY DATE: {{item.product.expirydate}}</p>
 
-                    <div class="pt-5">
-                      <h6 class="mb-0"><a href="#!" class="text-body"><i
-                            class="fas fa-long-arrow-alt-left me-2"></i><a href="{% url 'index' %}"> Back to shop</a></h6>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-lg-4 bg-grey">
-                  <div class="p-5">
-                    <h3 class="fw-bold mb-5 mt-2 pt-1">Summary</h3>
-                    <hr class="my-4">
-                      <hr class="my-4">
-                    <div class="d-flex justify-content-between mb-5">
-                      <h5 class="text-uppercase">Shipping Charges</h5>
-                      <h5>₹ {{shipping_amount}}</h5>
-                    </div>
-                    <div class="d-flex justify-content-between mb-5">
-                      <h5 class="text-uppercase">Total price</h5>
-                      <h5>₹ {{total_amount}}</h5>
-                    </div>
+</div>
 
-                    <a href="{% url 'payment' %}"><button type="button" class="btn btn-dark btn-block btn-lg"
-                      data-mdb-ripple-color="dark">Proceed</button></a>
+<div class="col-6">
+<ul class="pagination justify-content-end set_quantity">
+<li class="page-item">
 
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+<button class="minus-btn" data-id="{{ item.id }}">
+<i class="fas fa-minus"></i> </button></a>
+</li>
 
-<!--<section class="h-100 h-custom" style="background-color: #eee;">-->
-<!--  <div class="container py-5 h-100">-->
-<!--    <div class="row d-flex justify-content-center align-items-center h-100">-->
-<!--      <div class="col">-->
-<!--        <div class="card">-->
-<!--          <div class="card-body p-4">-->
+  <span class="quantity-input" data-id="{{ item.id }}">{{ item.quantity }}</span>
 
-<!--            <div class="row">-->
 
-<!--              <div class="col-lg-7">-->
-<!--                <h5 class="mb-3"><a href="#!" class="text-body"><i-->
-<!--                      class="fas fa-long-arrow-alt-left me-2"></i>Continue shopping</a></h5>-->
-<!--                <hr>-->
+<li class="page-item">
 
-<!--                <div class="d-flex justify-content-between align-items-center mb-4">-->
-<!--                  <div>-->
-<!--                    <p class="mb-1">Shopping cart</p>-->
-<!--                    <p class="mb-0">You have 4 items in your cart</p>-->
-<!--                  </div>-->
-<!--                  <div>-->
-<!--                    <p class="mb-0"><span class="text-muted">Sort by:</span> <a href="#!"-->
-<!--                        class="text-body">price <i class="fas fa-angle-down mt-1"></i></a></p>-->
-<!--                  </div>-->
-<!--                </div>-->
+<button class="plus-btn" data-id="{{ item.id }}"> <i class="fas fa-plus"></i></button>
 
-<!--                <div class="card mb-3">-->
-<!--                  <div class="card-body">-->
-<!--                    <div class="d-flex justify-content-between">-->
-<!--                      <div class="d-flex flex-row align-items-center">-->
-<!--                        <div>-->
-<!--                          <img-->
-<!--                            src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-shopping-carts/img1.webp"-->
-<!--                            class="img-fluid rounded-3" alt="Shopping item" style="width: 65px;">-->
-<!--                        </div>-->
-<!--                        <div class="ms-3">-->
-<!--                          <h5>Iphone 11 pro</h5>-->
-<!--                          <p class="small mb-0">256GB, Navy Blue</p>-->
-<!--                        </div>-->
-<!--                      </div>-->
-<!--                      <div class="d-flex flex-row align-items-center">-->
-<!--                        <div style="width: 50px;">-->
-<!--                          <h5 class="fw-normal mb-0">2</h5>-->
-<!--                        </div>-->
-<!--                        <div style="width: 80px;">-->
-<!--                          <h5 class="mb-0">$900</h5>-->
-<!--                        </div>-->
-<!--                        <a href="#!" style="color: #cecece;"><i class="fas fa-trash-alt"></i></a>-->
-<!--                      </div>-->
-<!--                    </div>-->
-<!--                  </div>-->
-<!--                </div>-->
+</li>
+</ul>
+</div>
+</div>
+<!-- //remover move and price -->
+<!--	{% csrf_token%}-->
+<div class="row" data-id="{{ item.id }}">
+<div class="col-8 d-flex justify-content-between remove_wish">
+	<p><a href=""></a><i class="fas fa-trash-alt"  data-id="{{ item.id }}">
 
-<!--                <div class="card mb-3">-->
-<!--                  <div class="card-body">-->
-<!--                    <div class="d-flex justify-content-between">-->
-<!--                      <div class="d-flex flex-row align-items-center">-->
-<!--                        <div>-->
-<!--                          <img-->
-<!--                            src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-shopping-carts/img2.webp"-->
-<!--                            class="img-fluid rounded-3" alt="Shopping item" style="width: 65px;">-->
-<!--                        </div>-->
-<!--                        <div class="ms-3">-->
-<!--                          <h5>Samsung galaxy Note 10 </h5>-->
-<!--                          <p class="small mb-0">256GB, Navy Blue</p>-->
-<!--                        </div>-->
-<!--                      </div>-->
-<!--                      <div class="d-flex flex-row align-items-center">-->
-<!--                        <div style="width: 50px;">-->
-<!--                          <h5 class="fw-normal mb-0">2</h5>-->
-<!--                        </div>-->
-<!--                        <div style="width: 80px;">-->
-<!--                          <h5 class="mb-0">$900</h5>-->
-<!--                        </div>-->
-<!--                        <a href="#!" style="color: #cecece;"><i class="fas fa-trash-alt"></i></a>-->
-<!--                      </div>-->
-<!--                    </div>-->
-<!--                  </div>-->
-<!--                </div>-->
+	</i><a href="" class= "removeitem" data-id="{{ item.id }}"> REMOVE ITEM</a>
+<!--<p><i class="fas fa-heart"></i>MOVE TO WISH LIST </p>-->
+</div>
 
-<!--                <div class="card mb-3">-->
-<!--                  <div class="card-body">-->
-<!--                    <div class="d-flex justify-content-between">-->
-<!--                      <div class="d-flex flex-row align-items-center">-->
-<!--                        <div>-->
-<!--                          <img-->
-<!--                            src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-shopping-carts/img3.webp"-->
-<!--                            class="img-fluid rounded-3" alt="Shopping item" style="width: 65px;">-->
-<!--                        </div>-->
-<!--                        <div class="ms-3">-->
-<!--                          <h5>Canon EOS M50</h5>-->
-<!--                          <p class="small mb-0">Onyx Black</p>-->
-<!--                        </div>-->
-<!--                      </div>-->
-<!--                      <div class="d-flex flex-row align-items-center">-->
-<!--                        <div style="width: 50px;">-->
-<!--                          <h5 class="fw-normal mb-0">1</h5>-->
-<!--                        </div>-->
-<!--                        <div style="width: 80px;">-->
-<!--                          <h5 class="mb-0">$1199</h5>-->
-<!--                        </div>-->
-<!--                        <a href="#!" style="color: #cecece;"><i class="fas fa-trash-alt"></i></a>-->
-<!--                      </div>-->
-<!--                    </div>-->
-<!--                  </div>-->
-<!--                </div>-->
 
-<!--                <div class="card mb-3 mb-lg-0">-->
-<!--                  <div class="card-body">-->
-<!--                    <div class="d-flex justify-content-between">-->
-<!--                      <div class="d-flex flex-row align-items-center">-->
-<!--                        <div>-->
-<!--                          <img-->
-<!--                            src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-shopping-carts/img4.webp"-->
-<!--                            class="img-fluid rounded-3" alt="Shopping item" style="width: 65px;">-->
-<!--                        </div>-->
-<!--                        <div class="ms-3">-->
-<!--                          <h5>MacBook Pro</h5>-->
-<!--                          <p class="small mb-0">1TB, Graphite</p>-->
-<!--                        </div>-->
-<!--                      </div>-->
-<!--                      <div class="d-flex flex-row align-items-center">-->
-<!--                        <div style="width: 50px;">-->
-<!--                          <h5 class="fw-normal mb-0">1</h5>-->
-<!--                        </div>-->
-<!--                        <div style="width: 80px;">-->
-<!--                          <h5 class="mb-0">$1799</h5>-->
-<!--                        </div>-->
-<!--                        <a href="#!" style="color: #cecece;"><i class="fas fa-trash-alt"></i></a>-->
-<!--                      </div>-->
-<!--                    </div>-->
-<!--                  </div>-->
-<!--                </div>-->
+	{% csrf_token%}
 
-<!--              </div>-->
-<!--              <div class="col-lg-5">-->
+	<div class="ha" name="quantity" value="{{ item.id }}">
+<!--  <input type="text" name="quantity" value="{{ item.quantity }}" class="quantity" data-id="{{ item.id }}" readonly>-->
+  <h3>Rs.<span class="total-price" data-id="{{ item.id }}">{{ item.total }}</span></h3>
+<!--		<h3><span class="quantity-input" data-id="{{ item.id }}">{{ item.quantity }}</span></h3>-->
+</div>
+</div>
+</div>
+</div>
+</div>
+<hr/>
 
-<!--                <div class="card bg-primary text-white rounded-3">-->
-<!--                  <div class="card-body">-->
-<!--                    <div class="d-flex justify-content-between align-items-center mb-4">-->
-<!--                      <h5 class="mb-0">Card details</h5>-->
-<!--                      <img src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/avatar-6.webp"-->
-<!--                        class="img-fluid rounded-3" style="width: 45px;" alt="Avatar">-->
-<!--                    </div>-->
+<!-- 2nd cart product -->
+<div class="card p-4">
+<div class="row">
+	{% endfor %}
 
-<!--                    <p class="small mb-2">Card type</p>-->
-<!--                    <a href="#!" type="submit" class="text-white"><i-->
-<!--                        class="fab fa-cc-mastercard fa-2x me-2"></i></a>-->
-<!--                    <a href="#!" type="submit" class="text-white"><i-->
-<!--                        class="fab fa-cc-visa fa-2x me-2"></i></a>-->
-<!--                    <a href="#!" type="submit" class="text-white"><i-->
-<!--                        class="fab fa-cc-amex fa-2x me-2"></i></a>-->
-<!--                    <a href="#!" type="submit" class="text-white"><i class="fab fa-cc-paypal fa-2x"></i></a>-->
 
-<!--                    <form class="mt-4">-->
-<!--                      <div class="form-outline form-white mb-4">-->
-<!--                        <input type="text" id="typeName" class="form-control form-control-lg" siez="17"-->
-<!--                          placeholder="Cardholder's Name" />-->
-<!--                        <label class="form-label" for="typeName">Cardholder's Name</label>-->
-<!--                      </div>-->
 
-<!--                      <div class="form-outline form-white mb-4">-->
-<!--                        <input type="text" id="typeText0" class="form-control form-control-lg" siez="17"-->
-<!--                          placeholder="1234 5678 9012 3457" minlength="19" maxlength="19" />-->
-<!--                        <label class="form-label" for="typeText0">Card Number</label>-->
-<!--                      </div>-->
 
-<!--                      <div class="row mb-4">-->
-<!--                        <div class="col-md-6">-->
-<!--                          <div class="form-outline form-white">-->
-<!--                            <input type="text" id="typeExp" class="form-control form-control-lg"-->
-<!--                              placeholder="MM/YYYY" size="7" id="exp" minlength="7" maxlength="7" />-->
-<!--                            <label class="form-label" for="typeExp">Expiration</label>-->
-<!--                          </div>-->
-<!--                        </div>-->
-<!--                        <div class="col-md-6">-->
-<!--                          <div class="form-outline form-white">-->
-<!--                            <input type="password" id="typeText2" class="form-control form-control-lg"-->
-<!--                              placeholder="&#9679;&#9679;&#9679;" size="1" minlength="3" maxlength="3" />-->
-<!--                            <label class="form-label" for="typeText2">Cvv</label>-->
-<!--                          </div>-->
-<!--                        </div>-->
-<!--                      </div>-->
+<!-- cart product details -->
+<div class="col-md-7 col-11 mx-auto px-4 mt-2">
+<div class="row">
+<!-- product name  -->
+<div class="col-6 card-title">
+<h1 class="mb-4 product_name"></h1>
 
-<!--                    </form>-->
+</ul>
+</div>
+</div>
+<!-- //remover move and price -->
+<div class="row">
+<div class="col-8 d-flex justify-content-between remove_wish">
 
-<!--                    <hr class="my-4">-->
+</div>
+<div class="col-4 d-flex justify-content-end price_money">
 
-<!--                    <div class="d-flex justify-content-between">-->
-<!--                      <p class="mb-2">Subtotal</p>-->
-<!--                      <p class="mb-2">$4798.00</p>-->
-<!--                    </div>-->
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- right side div -->
+<div class="col-md-12 col-lg-4 col-11 mx-auto mt-lg-0 mt-md-5">
+<div class="right_side p-3 shadow bg-white">
+<h2 class="product_name mb-5">The Total Amount Of</h2>
+<div class="price_indiv d-flex justify-content-between">
+<p>Product amount</p>
+<p>$<span id="result">{{total1}}</span>
 
-<!--                    <div class="d-flex justify-content-between">-->
-<!--                      <p class="mb-2">Shipping</p>-->
-<!--                      <p class="mb-2">$20.00</p>-->
-<!--                    </div>-->
+</div>
+<div class="price_indiv d-flex justify-content-between">
+<p>Shipping Charge</p>
+<p>$<span id="shipping_charge">50.0</span></p>
+</div>
+<hr />
+<div class="total-amt d-flex justify-content-between font-weight-bold">
+<p>The total amount of (including VAT)</p>
+<p>$<span id="result1">{{shipping}}</span></p>
 
-<!--                    <div class="d-flex justify-content-between mb-4">-->
-<!--                      <p class="mb-2">Total(Incl. taxes)</p>-->
-<!--                      <p class="mb-2">$4818.00</p>-->
-<!--                    </div>-->
+</div>
+	<a href="{% url 'Checkout'%}"><button class="btn btn-primary text-uppercase" >Checkout</button></a>
+</div>
 
-<!--                    <button type="button" class="btn btn-info btn-block btn-lg">-->
-<!--                      <div class="d-flex justify-content-between">-->
-<!--                        <span>$4818.00</span>-->
-<!--                        <span>Checkout <i class="fas fa-long-arrow-alt-right ms-2"></i></span>-->
-<!--                      </div>-->
-<!--                    </button>-->
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Optional JavaScript -->
+<!-- Popper.js first, then Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/js/bootstrap.min.js" integrity="sha384-oesi62hOLfzrys4LxRF63OJCXdXDipiYWBnvTl9Y9/TRlw5xlKIEHpNyvvDShgf/" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.js" integrity="sha512-6DC1eE3AWg1bgitkoaRM1lhY98PxbMIbhgYCGV107aZlyzzvaWCW1nJW2vDuYQm06hXrW0As6OGKcIaAVWnHJw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-<!--                  </div>-->
-<!--                </div>-->
+<script>
+	$(document).on('click', '.plus-btn', function() {
+		var csrftoken = $("[name=csrfmiddlewaretoken]").val();
+		var id = $(this).data('id');
+		$.ajax({
+			url: '{% url "plusqty" %}',
+			type: 'POST',
+			data: {'ids': id},  // use 'ids' to match the view
+			headers: { "X-CSRFToken": csrftoken },
+			success: function(data) {
+				$('.quantity-input[data-id="' + id + '"]').text(data.quantity);  // use correct JSON keys
+				$('.total-price[data-id="' + id + '"]').text(data.total);
+				$('.uniquetotal-price[data-id="' + id + '"]').text(data.total1);
+				$('.shipping-price[data-id="' + id + '"]').text(data.shipping);
+				$('.remaining[data-id="' + id + '"]').text(data.value);
+				$('#result').text(data.total1);
+				$('#result1').text(data.shipping);
+				$('#result2').text(data.value);
+				console.log("The product quantity: " + data.quantity);
+				console.log("The product total: " + data.total);
+				console.log("The product total: " + data.total1);
+			},
+			error: function(xhr, status, error) {
+				alert(xhr.responseJSON.error);
+			}
+		});
+	});
+</script>
+<script>
+	$(document).on('click', '.minus-btn', function() {
+		var csrftoken = $("[name=csrfmiddlewaretoken]").val();
+		var id = $(this).data('id');
+		$.ajax({
+			url: '{% url "minusqty" %}',
+			type: 'POST',
+			data: {'ids': id},  // use 'ids' to match the view
+			headers: { "X-CSRFToken": csrftoken },
+			success: function(data) {
+				$('.quantity-input[data-id="' + id + '"]').text(data.quantity);  // use correct JSON keys
+				$('.total-price[data-id="' + id + '"]').text(data.total);
+				$('.uniquetotal-price[data-id="' + id + '"]').text(data.total1);
+				$('.shipping-price[data-id="' + id + '"]').text(data.shipping)
+				$('#result').text(data.total1);
+				$('#result1').text(data.shipping);
+				$('#result2').text(data.value);
 
-<!--              </div>-->
+				console.log("The product quantity: " + data.quantity);
+				console.log("The product total: " + data.total);
+				console.log("The product shipping: " + data.shipping);
+			},
+			error: function(xhr, status, error) {
+				alert(xhr.responseJSON.error);
+			}
+		});
+	});
+</script>
 
-<!--            </div>-->
 
-<!--          </div>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </div>-->
-<!--  </div>-->
-<!--</section>-->
-{% endblock %}
 
+<script>
+	$(document).on('click', '.removeitem', function() {
+		var csrftoken = $("[name=csrfmiddlewaretoken]").val();
+		var id = $(this).data('id');
+		console.log("The product quantity: " + id);
+		$.ajax({
+			url: '/customerRemoveCart/',
+			type: 'POST',
+			data: {'ids': id},
+			headers: { "X-CSRFToken": csrftoken },
+			success: function(data) {
+
+				$('.uniquetotal-price[data-id="' + id + '"]').text(data.total1);
+				$('.shipping-price[data-id="' + id + '"]').text(data.shipping)
+				$('#result').text(data.total1);
+				$('#result1').text(data.shipping);
+
+
+				console.log("The product total: " + data.total1);
+				console.log("The product total: " + data.shipping);
+			},
+			error: function(xhr, status, error) {
+				alert(xhr.responseJSON.error);
+			}
+		});
+	});
+</script>
+
+
+
+</body>
+</html>
+{% endblock content %}

@@ -1,5 +1,24 @@
-<form method="POST">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Submit</button>
-</form>
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>{{ object.first_name }} {{ object.last_name }}</h1>
+  <p><strong>Gender:</strong> {{ object.gender }}</p>
+  <p><strong>Blood Group:</strong> {{ object.blood_group }}</p>
+  <p><strong>Date of Birth:</strong> {{ object.date_of_birth }}</p>
+  <p><strong>Past Medical History:</strong> {{ object.past_medical_history }}</p>
+  <p><strong>PDF File:</strong> <a href="{{ object.pdf_file.url }}">{{ object.pdf_file.name }}</a></p>
+  <p><strong>Supplements:</strong> {% for supplement in object.supplements.all %}{{ supplement.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+  <p><strong>Smoker:</strong> {% if object.is_smoker %}Yes{% else %}No{% endif %}</p>
+  <p><strong>Dental Images:</strong></p>
+  <ul>
+    {% if object.dental_image1 %}
+      <li><a href="{{ object.dental_image1.url }}">{{ object.dental_image1.name }}</a></li>
+    {% endif %}
+    {% if object.dental_image2 %}
+      <li><a href="{{ object.dental_image2.url }}">{{ object.dental_image2.name }}</a></li>
+    {% endif %}
+    {% if object.dental_image3 %}
+      <li><a href="{{ object.dental_image3.url }}">{{ object.dental_image3.name }}</a></li>
+    {% endif %}
+  </ul>
+{% endblock %}

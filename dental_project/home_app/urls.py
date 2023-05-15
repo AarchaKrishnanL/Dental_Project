@@ -5,6 +5,7 @@ from dental_project import settings
 from . import views
 from django.contrib.auth import views as auth_views
 
+
 urlpatterns = [
     path('', views.demo,name='home'),
     path('about/', views.about,name='about'),
@@ -13,20 +14,20 @@ urlpatterns = [
     path('doctors', views.doctors,name='doctors'),
     path('contact', views.contact,name='contact'),
     path('services', views.services,name='services'),
-    path('shopping', views.shopping,name='shopping'),
     path('time_slot', views.time_slot,name='time_slot'),
     path('login', views.user_login,name='login'),
     # path('doctor_view_bookings', views.doctor_view_bookings, name='doctor_view_bookings'),
     path('register', views.register,name='register'),
     path('index', views.index,name='index'),
+    path('indexx', views.indexx, name='indexx'),
     path('payment', views.payment,name='payment'),
-    path('cart', views.cart,name='cart'),
     path('details_successfull', views.details_successfull,name='details_successfull'),
     path('thanks', views.thanks,name='thanks'),
-    path('consultation_form', views.consultation_form,name='consultation_form'),
+    # path('consultation_form', views.consultation_form,name='consultation_form'),
+    path('consultation_view', views.consultation_view, name='consultation_view'),
      path('doctorlogin', views.doctorlogin, name='doctorlogin'),
     path('doctor_patient', views.doctor_patient, name='doctor_patient'),
-    # path('patient_form', views.patient_form, name='patient_form'),
+    path('patient_form', views.patient_form.as_view(), name='patient_form'),
     # path('patient_list', views.patient_list, name='patient_list'),
     path('user', views.user,name='user'),
     path('logout', views.logout, name='logout'),
@@ -43,6 +44,8 @@ urlpatterns = [
     # path('details_user', views.details_user, name='details_user'),
     path('<int:id>', views.update_details, name='update_details'),
     path('details_doctor', views.details_doctor, name='details_doctor'),
+    path('view_receipt/<id>', views.view_receipt, name='view_receipt'),
+    # path('generate_pdf', views.generate_pdf, name='generate_pdf'),
     path('doctor_register', views.doctor_register, name='doctor_register'),
     path('<int:id>', views.update_doctor, name='update_doctor'),
     path("__reload__/", include("django_browser_reload.urls")),

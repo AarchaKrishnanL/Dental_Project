@@ -7,7 +7,7 @@ from django.forms import ModelForm
 from django.core import validators
 
 from . import models
-from .models import Booking, Details_User, Details_Doctor,Update_Booking
+from .models import Booking, Details_User, Details_Doctor, Update_Booking
 from django import forms
 from django.forms.widgets import DateInput
 from django.utils import timezone
@@ -143,25 +143,106 @@ class Update_BookingForm(forms.ModelForm):
              'description' : "Description:",
         }
 
+GENDER_CHOICES = [
+        ('female', 'Female'),
+        ('male', 'Male'),
+        ('other', 'Other'),
+]
+BLOOD_GROUP_CHOICES = [
+    ('O+', 'O+'),
+    ('A+', 'A+'),
+    ('B+', 'B+'),
+    ('AB+', 'AB+'),
+    ('O-', 'O-'),
+    ('A-', 'A-'),
+    ('B-', 'B-'),
+    ('AB-', 'AB-'),
+]
 
-class PatientForm(forms.ModelForm):
+SUPPLIMENT_CHOICES = [
+    ('Multivitamin', 'Multivitamin'),
+    ('Omega3', 'Omega3'),
+    ('Vitamin3', 'Vitamin3'),
+    ('BComplex', 'BComplex'),
+    ('Vitamin D/D3', 'Vitamin D/D3'),
+    ('Zinc', 'Zinc'),
+    ('Folic Acid', 'Folic Acid'),
+    ('Melatonin', 'Melatonin'),
+    ('Biotin', 'Biotin'),
+    ('Coenzyme', 'Coenzyme'),
+    ('None', 'None'),
+    ('Other', 'Other'),
+]
+
+ISSUES_CHOICES = [
+    ('Hormone Imbalance', 'Hormone Imbalance'),
+    ('Asthma', 'Asthma'),
+    ('Cancer/Systemic disease', 'Cancer/Systemic disease'),
+    ('Epilepsy/Seizure', 'Epilepsy/Seizure'),
+    ('High Blood Pressure', 'High Blood Pressure'),
+    ('Diabetes', 'Diabetes'),
+    ('Heart Problems', 'Heart Problems'),
+    ('HIV/AIDS', 'HIV/AIDS'),
+    ('Auto immune Disorder', 'Auto immune Disorder'),
+    ('Depression', 'Depression'),
+    ('HeadAches/Migrations', 'HeadAches/Migrations'),
+    ('Other', 'Other'),
+    ('None', 'None'),
+]
+
+ALLERGY_CHOICES = [
+    ('Aspirin', 'Aspirin'),
+    ('Shellfish', 'Shellfish'),
+    ('Tree Nuts', 'Tree Nuts'),
+    ('Iodine', 'Iodine'),
+    ('Latex', 'Latex'),
+    ('Dairy', 'Dairy'),
+    ('Fruits', 'Fruits'),
+    ('Vegetables', 'Vegetables'),
+    ('Other', 'Other'),
+    ('None', 'None'),
+]
+
+SMOKER_CHOICES = [
+    ('yes', 'yes'),
+    ('no', 'no'),
+]
+BEVARAGE_CHOICES = [
+    ('yes', 'yes'),
+    ('no', 'no'),
+]
+CLAUSTROPHOBIC_CHOICES = [
+    ('yes', 'yes'),
+    ('no', 'no'),
+]
+PAIN_CHOICES = [
+    ('low', 'low'),
+    ('medium', 'medium'),
+    ('high', 'high'),
+]
+class PatientsForm(forms.ModelForm):
+    Gender = forms.ChoiceField(choices=GENDER_CHOICES, widget=forms.RadioSelect)
+    Blood_group = forms.ChoiceField(choices=BLOOD_GROUP_CHOICES,widget=forms.RadioSelect)
+    Supplements =forms.MultipleChoiceField(label='Do you take any of the following health/dietry supplements?',
+                                           choices=SUPPLIMENT_CHOICES,widget=forms.CheckboxSelectMultiple)
+    Health_issues = forms.MultipleChoiceField(label='Have you ever experienced any of these health conditions in the past or present?',
+                                           choices=ISSUES_CHOICES,widget=forms.CheckboxSelectMultiple)
+    Allergies = forms.MultipleChoiceField(label='Have any Allegies?',
+                                           choices=ALLERGY_CHOICES,widget=forms.CheckboxSelectMultiple)
+    Smoker = forms.ChoiceField(choices=SMOKER_CHOICES,widget=forms.RadioSelect,label='Are you a Smoker?')
+    Beverages = forms.ChoiceField(choices=BEVARAGE_CHOICES,widget=forms.RadioSelect,label='Do you drink more than 4 caffeinated beverages a day?')
+    Claustrophobic = forms.ChoiceField(choices=CLAUSTROPHOBIC_CHOICES,widget=forms.RadioSelect,label='Have you ever experienced claustrophobic?')
+    Pain = forms.ChoiceField(choices=PAIN_CHOICES,widget=forms.RadioSelect,label='Rate your tolerence in pain?')
+
     class Meta:
         model = Patients
-        fields = '__all__'  # You can also specify individual fields here
-
-        widgets = {
-            'date_of_birth': CustomDateInput(),
-        }
-
-# class MedicalHistoryForm(forms.ModelForm):
-#     class Meta:
-#         model = MedicalHistory
-#         exclude = ['patient']  # Exclude the patient field from the form
-#
-# class GeneralHealthForm(forms.ModelForm):
-#     class Meta:
-#         model = GeneralHealth
-#         exclude = ['patient']  # Exclude the patient field from the form
-
+        fields =  ['date_of_birth','previous_report','photo1','photo2','photo3']
+    labels = {'date_of_birth':'Dateof Birth','previous_report':"Previous Report",
+              'photo1':"Photo1",'photo2':"Photo2",
+              'photo3':"Photo3"
+              }
+    widgets = {
+        'date_of_birth':forms.TextInput(attrs={'class':'form-control','id':'datepicker'}),
+    }
 
 

@@ -12,19 +12,25 @@ from django.shortcuts import redirect
 from django.contrib import auth, messages
 from django.contrib.auth.models import User, Group
 from django.db.models import Q
+from django.views import View
+
+from reportlab.pdfgen import canvas
+
+
 
 from tkinter import *
 import os
 
+from django.views.generic import CreateView
+from scipy.optimize._tstutils import description
+
 from dental_project import settings
-from . import forms, models
 from .forms import BookingForm, Details_UserForm, Details_DoctorForm, RegisterUserForm,Update_BookingForm
 # from .forms import PatientForm, MedicalHistoryForm, GeneralHealthForm
-from .models import Services, Doctors, Booking, Time_slot, Details_User, Update_Booking, Details_Doctor, Appointment, \
-    Patients, Product, Cart
+from .models import Services, Doctors, Booking, Time_slot, Details_User, Update_Booking, Details_Doctor,Patients
 from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
-from .forms import PatientForm
+from .forms import PatientsForm
 # from .forms import DentalForm
 
 # Create your views here.
@@ -60,37 +66,6 @@ def predict(request):
 
 
 
-# def predict(request):
-#     if request.method == 'POST':
-#         # get symptoms from user input
-#         symptoms = request.POST.get('symptoms').split(',')
-#
-#         # load trained Naive Bayes classifier
-#         train_df = pd.read_csv('training.csv')
-#         test_df = pd.read_csv('testing.csv')
-#         X_train = train_df.iloc[:, :-1]
-#         y_train = train_df.iloc[:, -1]
-#         X_test = test_df.iloc[:, :-1]
-#         y_test = test_df.iloc[:, -1]
-#         nb_classifier = GaussianNB()
-#         nb_classifier.fit(X_train, y_train)
-#
-#         # prepare symptoms for prediction
-#         pred_data = []
-#         for i in range(len(X_test.columns)):
-#             if X_test.columns[i] in symptoms:
-#                 pred_data.append(1)
-#             else:
-#                 pred_data.append(0)
-#
-#         # make prediction
-#         pred = nb_classifier.predict([pred_data])
-#
-#         # return predicted disease to user
-#         return HttpResponse(f"Based on the symptoms provided, you may have {pred[0]}")
-#
-#     else:
-#         return render(request, 'predict.html')
 
 
 def payment(request):
@@ -113,17 +88,6 @@ def payment(request):
     return render(request,'payment.html',context)
 
 
-
-def cart(request):
-    return render(request, "cart.html")
-
-
-def shopping(request):
-    dict_shop = {
-        'shopping': Product.objects.all()
-    }
-    return render(request, "shopping.html", dict_shop)
-
 def thanks(request):
     return render(request, "thanks.html")
 
@@ -145,6 +109,10 @@ def loginn(request):
 
 def doctor_patient(request):
     return render(request, "doctor_patient.html")
+
+def consultation_view(request):
+    return render(request, "consultation_view.html")
+
 
 
 def doctor_register(request):
@@ -304,7 +272,7 @@ def user_login(request):
         user = auth.authenticate(username=username, password=password)
         if user is not None:
             auth.login(request, user)
-            return redirect('index')
+            return redirect('indexx')
         else:
             messages.info(request,"Invalid credentials")
             return redirect('login')
@@ -359,6 +327,10 @@ def register(request):
 def index(request):
     return render (request,"index.html")
 
+def indexx(request):
+    return render (request,"indexx.html")
+
+
 def logout(request):
     if request.user.is_authenticated:
         auth.logout(request)
@@ -371,7 +343,7 @@ def toconsult_form(request):
 
 def user(request):
     if request.user.is_authenticated:
-        return render(request, "index.html")
+        return render(request, "indexx.html")
     return redirect('login')
 
 
@@ -515,45 +487,40 @@ def update_booking(request):
         form=BookingForm
     return render(request,'booking.html',{'form':form})
 
-def consultation_form(request):
-    if request.method == "POST":
-        form = PatientForm(request.POST)
-        if form.is_valid():
-            gender = form.cleaned_data['gender']
-            blood_group = form.cleaned_data['blood_group']
-            date_of_birth = form.cleaned_data['date_of_birth']
-            previous_report = form.cleaned_data['previous_report']
-            supplements = form.cleaned_data['supplements']
-            allergies = form.cleaned_data['allergies']
-            health_issues = form.cleaned_data['health_issues']
-            medications = form.cleaned_data['medications']
-            hospitalizations = form.cleaned_data['hospitalizations']
-            surgeries = form.cleaned_data['surgeries']
-            consultation_form = Patients(gender=gender, blood_group=blood_group, date_of_birth=date_of_birth,
-                          previous_report=previous_report,supplements=supplements, allergies=allergies,
-                          health_issues=health_issues,medications=medications, hospitalizations=hospitalizations,
-                          surgeries=surgeries)
-            consultation_form.save()
-            # return render(request, 'details_successfull.html')
-            messages.info(request, 'Details added successfully')
-            consultation_info = Patients.objects.filter()
-            return render(request, 'details_successfull.html', {
-                'info': consultation_info,
-                'gender': gender,
-                'blood_group': blood_group,
-                'date_of_birth': date_of_birth,
-                'previous_report': previous_report,
-                'supplements': supplements,
-                'allergies': allergies,
-                'health_issues': health_issues,
-                'medications': medications,
-                'hospitalizations': hospitalizations,
-                'surgeries': surgeries,
-            })
-
-    else:
-        form = PatientForm
-    return render(request, 'consultation_form.html', {'form': form})
+# def consultation_form(request):
+#     if request.method == "POST":
+#         form = PatientForm(request.POST)
+#         if form.is_valid():
+#             gender = form.cleaned_data['gender']
+#             blood_group = form.cleaned_data['blood_group']
+#             date_of_birth = form.cleaned_data['date_of_birth']
+#             previous_report = form.cleaned_data['previous_report']
+#             supplements = form.cleaned_data['supplements']
+#             allergies = form.cleaned_data['allergies']
+#             health_issues = form.cleaned_data['health_issues']
+#             medications = form.cleaned_data['medications']
+#             consultation_form = Patients(gender=gender, blood_group=blood_group, date_of_birth=date_of_birth,
+#                           previous_report=previous_report,supplements=supplements, allergies=allergies,
+#                           health_issues=health_issues,medications=medications)
+#             consultation_form.save()
+#             # return render(request, 'details_successfull.html')
+#             messages.info(request, 'Details added successfully')
+#             consultation_info = Patients.objects.filter()
+#             return render(request, 'details_successfull.html', {
+#                 'info': consultation_info,
+#                 'gender': gender,
+#                 'blood_group': blood_group,
+#                 'date_of_birth': date_of_birth,
+#                 'previous_report': previous_report,
+#                 'supplements': supplements,
+#                 'allergies': allergies,
+#                 'health_issues': health_issues,
+#                 'medications': medications,
+#             })
+#
+#     else:
+#         form = PatientForm
+#     return render(request, 'consultation_form.html', {'form': form})
 
 
 
@@ -563,47 +530,47 @@ def consultation_form(request):
 
 
 
-def my_details(request):
-    if request.method == "POST":
-        form = PatientForm(request.POST)
-        if form.is_valid():
-            gender = form.cleaned_data['gender']
-            blood_group = form.cleaned_data['blood_group']
-            date_of_birth = form.cleaned_data['date_of_birth']
-            previous_report = form.cleaned_data['previous_report']
-            supplements = form.cleaned_data['supplements']
-            allergies = form.cleaned_data['allergies']
-            health_issues = form.cleaned_data['health_issues']
-            medications = form.cleaned_data['medications']
-            hospitalizations = form.cleaned_data['hospitalizations']
-            surgeries = form.cleaned_data['surgeries']
-            consultation_form = Patients(gender=gender, blood_group=blood_group, date_of_birth=date_of_birth,
-                                         previous_report=previous_report, supplements=supplements, allergies=allergies,
-                                         health_issues=health_issues, medications=medications,
-                                         hospitalizations=hospitalizations,
-                                         surgeries=surgeries)
-            consultation_form.save()
-            messages.info(request, 'Details added successfully')
-            consultation_info = Patients.objects.filter()
-            return render(request, 'my_details.html', {
-                'info': consultation_info,
-                'gender': gender,
-                'blood_group': blood_group,
-                'date_of_birth': date_of_birth,
-                'previous_report': previous_report,
-                'supplements': supplements,
-                'allergies': allergies,
-                'health_issues': health_issues,
-                'medications': medications,
-                'hospitalizations': hospitalizations,
-                'surgeries': surgeries,
-            })
-    if request.user.is_authenticated:
-        details_info = Patients.objects.all()
-        return render(request, "my_details.html",{
-            'info':details_info,
-        })
-    return redirect('consultation_form')
+# def my_details(request):
+#     if request.method == "POST":
+#         form = PatientForm(request.POST)
+#         if form.is_valid():
+#             gender = form.cleaned_data['gender']
+#             blood_group = form.cleaned_data['blood_group']
+#             date_of_birth = form.cleaned_data['date_of_birth']
+#             previous_report = form.cleaned_data['previous_report']
+#             supplements = form.cleaned_data['supplements']
+#             allergies = form.cleaned_data['allergies']
+#             health_issues = form.cleaned_data['health_issues']
+#             medications = form.cleaned_data['medications']
+#             hospitalizations = form.cleaned_data['hospitalizations']
+#             surgeries = form.cleaned_data['surgeries']
+#             consultation_form = Patients(gender=gender, blood_group=blood_group, date_of_birth=date_of_birth,
+#                                          previous_report=previous_report, supplements=supplements, allergies=allergies,
+#                                          health_issues=health_issues, medications=medications,
+#                                          hospitalizations=hospitalizations,
+#                                          surgeries=surgeries)
+#             consultation_form.save()
+#             messages.info(request, 'Details added successfully')
+#             consultation_info = Patients.objects.filter()
+#             return render(request, 'my_details.html', {
+#                 'info': consultation_info,
+#                 'gender': gender,
+#                 'blood_group': blood_group,
+#                 'date_of_birth': date_of_birth,
+#                 'previous_report': previous_report,
+#                 'supplements': supplements,
+#                 'allergies': allergies,
+#                 'health_issues': health_issues,
+#                 'medications': medications,
+#                 'hospitalizations': hospitalizations,
+#                 'surgeries': surgeries,
+#             })
+#     if request.user.is_authenticated:
+#         details_info = Patients.objects.all()
+#         return render(request, "my_details.html",{
+#             'info':details_info,
+#         })
+#     return redirect('consultation_form')
 
 def services_search(request):
     if request.method == 'GET':
@@ -669,64 +636,58 @@ def doctor_bookings(request):
     return redirect('booking')
 
 
-def add_cart(request):
-    if(request.method=='POST'):
-        user = request.user
-        product_id = request.POST.get('prod_id')
-        quantity = request.POST.get('qty',1)
-        if(product_id is None):
-            messages.error(request,"Product id is not mentioned")
-            # return
-        p = Product.objects.get(pk=product_id)
-        if(p.stock<quantity):
-            messages.error(request,"Out of stock")
-            return redirect('userhome')
-        cart,created  = Cart.objects.get_or_create(user=user,product=p)
-        if created:
-            cart.product_qty=quantity
-        else:
-            cart.product_qty+=quantity
-        cart.save()
-        #messages.success(request,"Product Added Succesfully")
-        return redirect('index')
+def view_receipt(request,id):
+    data = Booking.objects.get(id=id)
+    # Get the booking details from the request
+    doc_name_id = data.doc_name_id
+    booking_date = data.booking_date
+    booked_on = data.booked_on
+    time_slot_id = data.time_slot_id
+    description = data.description
+    print(doc_name_id )
+    doctor=Doctors.objects.get(id=doc_name_id)
+    time_slot = Time_slot.objects.get(id=time_slot_id)
+
+    # Create a booking object with the details
+    booking = Booking(doc_name_id=doctor,booked_on =booked_on,
+                      booking_date=booking_date, time_slot_id=time_slot,
+                      description=description)
+
+    # Create a PDF file object
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="booking.pdf"'
+
+    # Create a canvas object and write the PDF content
+    p = canvas.Canvas(response)
+
+    p.setFillColorRGB(0.5, 0.5, 1)  # Set background color to light blue
+    p.rect(0, 0, 612, 1000, fill=True)  # Draw a rectangle to fill the entire page
+
+    p.setFont("Helvetica-Bold", 36)  # Set font type and size
+    p.setFillColorRGB(0, 0, 0)  # Set text color to red
+    p.drawString(100, 750, "Receipt")  # Draw the "Receipt" text
+    p.setFont("Helvetica-Bold", 12)  # Set font type and size for the remaining text
+    p.setFillColorRGB(0, 0, 0)  # Set text color to black
+    p.drawString(100, 700, f"Patient Name: Maaya Krishna")
+    p.drawString(100, 650, f"Doctor: {booking.doc_name_id}")
+    p.drawString(100, 600, f"Booking date: {booking.booking_date}")
+    p.drawString(100, 550, f"Booked on: {booking.booked_on}")
+    p.drawString(100, 500, f"Time slot: {booking.time_slot_id}")
+    p.drawString(100, 450, f"Description: {booking.description}")
+    p.drawString(100, 400, f"Fee: 120/-")
+    p.drawString(100, 350, f"Payment Status: Success")
+    p.showPage()
+    p.save()
+
+    return response
 
 
-def view_cart(request):
-    if request.user.is_authenticated:
-        user = request.user
-        cart = Cart.objects.filter(user=user).order_by('-id')
-
-        amount = 0.0
-        shipping_amount = 75.0
-        total_amount = 0.0
-
-        cart_product = [p for p in Cart.objects.all() if p.user == user]
-        # print(cart_product)
-        if cart_product:
-            for p in cart_product:
-                subtotal = (p.product_qty * p.product.price)
-                amount += float(subtotal)
-
-                total_amount = amount + shipping_amount
-            return render(request, 'cart.html',
-                          {'cart_all': cart, 'subtotal': subtotal, 'total_amount': total_amount, 'amount': amount,
-                           'shipping_amount': shipping_amount})
-        else:
-            return render(request, 'emptycart.html')
-    if user == request.user:
-        item = Product.objects.get(id=id)
-        user = request.session['email']
-        if item.stock > 0:
-            item.stock -= 1
-            if Cart.objects.filter(user_id=user, product_id=item).exists():
-                c_item = Cart.objects.get(user_id=user, product_id=item)
-                c_item.product_qty = c_item.product_qty + 1
-                return redirect('view_cart')
-            else:
-                product_qty = 1
-                price = item.price * product_qty
-                new_cart = Cart(user_id=user, product_id=item.id, product_qty=product_qty, price=price)
-                new_cart.save()
-                return redirect('view_cart')
-    # messages.success(request, 'Sign in..!!')
-    return redirect('login')
+class patient_form(View):
+    def get(self,request):
+        form = PatientsForm()
+        return  render(request,'patient_form.html',{'form':form})
+    def post(self, request):
+        form = PatientsForm(request.POST,request.FILES)
+        if form.is_valid():
+            form.save()
+            return render(request,'patient_form.html',{'form':form})

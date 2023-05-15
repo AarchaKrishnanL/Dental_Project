@@ -45,14 +45,13 @@ def NaiveBayes():
     from sklearn.naive_bayes import MultinomialNB
 
     gnb = MultinomialNB()
-    # gnb = gnb.fit(X, np.ravel(y))
-
     gnb.fit(X, np.asarray(y, dtype=int).ravel())
     gnb = gnb.fit(X, pd.Series(np.ravel(y)))
-    # gnb=gnb.fit(X,np.ravel(y))
     from sklearn.metrics import accuracy_score
     y_pred = gnb.predict(X_test)
+    print("Fraction of correctly classified samples:")
     print(accuracy_score(y_test, y_pred))
+    print("Number of correctly classified samples:")
     print(accuracy_score(y_test, y_pred, normalize=False))
 
     psymptoms = [Symptom1.get(),Symptom2.get(),Symptom3.get(),Symptom4.get(),Symptom5.get()]
