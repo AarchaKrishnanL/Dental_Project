@@ -95,6 +95,9 @@ def thanks(request):
 def front(request):
     return render(request, "front.html")
 
+def prescription(request):
+    return render(request, "prescription.html")
+
 def about(request):
     return render(request, "about.html")
 
@@ -140,81 +143,6 @@ def time_slot(request):
         'time_slot':Time_slot.objects.all()
     }
     return render(request, "time_slot.html",dict_timeslot)
-
-# def patient_list(request):
-#     patients = Patient.objects.all()
-#     return render(request, 'patient_list.html', {'patients': patients})
-#
-# def patient_form(request):
-#     return render(request, "patient_form.html")
-# def patient_form(request):
-    # if request.method == "POST":
-    #     form = PatientForm(request.POST)
-    #     if form.is_valid():
-    #         blood_group = form.cleaned_data['blood_group']
-    #         gender = form.cleaned_data['gender']
-    #         dob = form.cleaned_data['dob']
-    #         address = form.cleaned_data['address']
-    #         allergies = form.cleaned_data['allergies']
-    #         records = form.cleaned_data['records']
-    #         details_usr=Details_User(blood_group=blood_group,gender=gender,dob=dob,address=address,allergies=allergies,records=records)
-    #         details_usr.save()
-    #         form = PatientForm
-    # # else:
-    #     form = PatientForm
-    #     patient = Patient.objects.all()
-    #     return render(request,'patient_list.html', {'form':form,'patient':patient})
-
-# def patient_create(request):
-#     if request.method == 'POST':
-#         form = PatientForm(request.POST, request.FILES)
-#         if form.is_valid():
-#             form.save()
-#             return redirect('patient_list')
-#     else:
-#         form = PatientForm()
-#     return render(request, 'patient_list.html', {'form': form})
-#
-# def patient_update(request, pk):
-#     patient = get_object_or_404(Patient, pk=pk)
-#     if request.method == 'POST':
-#         form = PatientForm(request.POST, request.FILES, instance=patient)
-#         if form.is_valid():
-#             form.save()
-#             return redirect('patient_list')
-#     else:
-#         form = PatientForm(instance=patient)
-#     return render(request, 'patient_list.html', {'form': form})
-#
-# def patient_delete(request, pk):
-#     patient = get_object_or_404(Patient, pk=pk)
-#     patient.delete()
-#     return redirect('patient_list')
-#
-
-
-# def booking(request):
-#     if request.method == "POST":
-#         form = BookingForm(request.POST)
-#         if form.is_valid():
-#             doc_name=form.cleaned_data['doc_name']
-#             booking_date = form.cleaned_data['booking_date']
-#             time_slot = form.cleaned_data['time_slot']
-#             description = form.cleaned_data['description']
-#             booking = Booking(doc_name=doc_name,booking_date=booking_date,time_slot=time_slot,description=description)
-#             booking.save()
-#             messages.info(request,'New booking added successfully')
-#             booking_info=Booking.objects.filter()
-#             return render(request, 'my_bookings.html',{
-#                 'info':booking_info,
-#                 'doc_name':doc_name,
-#                 'booking_date':booking_date,
-#                 'time_slot':time_slot,
-#                 'description':description,
-#             })
-#     else:
-#         form=BookingForm
-#     return render(request,'booking.html',{'form':form})
 
 
 def booking(request):
@@ -291,21 +219,6 @@ def doctorlogin(request):
                 return render(request, 'doctorlogin.html', {'error_message': error_message})
         else:
             return render(request, 'doctorlogin.html')
-
-    # if request.user.is_authenticated:
-    #     return redirect('doctor_page')
-    # if request.method == 'POST':
-    #     username = request.POST['username']
-    #     password = request.POST['password']
-    #     user = auth.authenticate(username=username, password=password)
-    #     if user is not None:
-    #         auth.login(request, user)
-    #         return redirect('doctorlogin')
-    #     else:
-    #         messages.info(request,"Invalid credentials")
-    #         return redirect('doctorlogin')
-    # return render(request, "doctorlogin.html")
-
 
 
 def register(request):
@@ -487,90 +400,6 @@ def update_booking(request):
         form=BookingForm
     return render(request,'booking.html',{'form':form})
 
-# def consultation_form(request):
-#     if request.method == "POST":
-#         form = PatientForm(request.POST)
-#         if form.is_valid():
-#             gender = form.cleaned_data['gender']
-#             blood_group = form.cleaned_data['blood_group']
-#             date_of_birth = form.cleaned_data['date_of_birth']
-#             previous_report = form.cleaned_data['previous_report']
-#             supplements = form.cleaned_data['supplements']
-#             allergies = form.cleaned_data['allergies']
-#             health_issues = form.cleaned_data['health_issues']
-#             medications = form.cleaned_data['medications']
-#             consultation_form = Patients(gender=gender, blood_group=blood_group, date_of_birth=date_of_birth,
-#                           previous_report=previous_report,supplements=supplements, allergies=allergies,
-#                           health_issues=health_issues,medications=medications)
-#             consultation_form.save()
-#             # return render(request, 'details_successfull.html')
-#             messages.info(request, 'Details added successfully')
-#             consultation_info = Patients.objects.filter()
-#             return render(request, 'details_successfull.html', {
-#                 'info': consultation_info,
-#                 'gender': gender,
-#                 'blood_group': blood_group,
-#                 'date_of_birth': date_of_birth,
-#                 'previous_report': previous_report,
-#                 'supplements': supplements,
-#                 'allergies': allergies,
-#                 'health_issues': health_issues,
-#                 'medications': medications,
-#             })
-#
-#     else:
-#         form = PatientForm
-#     return render(request, 'consultation_form.html', {'form': form})
-
-
-
-
-
-
-
-
-
-# def my_details(request):
-#     if request.method == "POST":
-#         form = PatientForm(request.POST)
-#         if form.is_valid():
-#             gender = form.cleaned_data['gender']
-#             blood_group = form.cleaned_data['blood_group']
-#             date_of_birth = form.cleaned_data['date_of_birth']
-#             previous_report = form.cleaned_data['previous_report']
-#             supplements = form.cleaned_data['supplements']
-#             allergies = form.cleaned_data['allergies']
-#             health_issues = form.cleaned_data['health_issues']
-#             medications = form.cleaned_data['medications']
-#             hospitalizations = form.cleaned_data['hospitalizations']
-#             surgeries = form.cleaned_data['surgeries']
-#             consultation_form = Patients(gender=gender, blood_group=blood_group, date_of_birth=date_of_birth,
-#                                          previous_report=previous_report, supplements=supplements, allergies=allergies,
-#                                          health_issues=health_issues, medications=medications,
-#                                          hospitalizations=hospitalizations,
-#                                          surgeries=surgeries)
-#             consultation_form.save()
-#             messages.info(request, 'Details added successfully')
-#             consultation_info = Patients.objects.filter()
-#             return render(request, 'my_details.html', {
-#                 'info': consultation_info,
-#                 'gender': gender,
-#                 'blood_group': blood_group,
-#                 'date_of_birth': date_of_birth,
-#                 'previous_report': previous_report,
-#                 'supplements': supplements,
-#                 'allergies': allergies,
-#                 'health_issues': health_issues,
-#                 'medications': medications,
-#                 'hospitalizations': hospitalizations,
-#                 'surgeries': surgeries,
-#             })
-#     if request.user.is_authenticated:
-#         details_info = Patients.objects.all()
-#         return render(request, "my_details.html",{
-#             'info':details_info,
-#         })
-#     return redirect('consultation_form')
 
 def services_search(request):
     if request.method == 'GET':

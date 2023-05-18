@@ -7,7 +7,7 @@ from django.forms import ModelForm
 from django.core import validators
 
 from . import models
-from .models import Booking, Details_User, Details_Doctor, Update_Booking
+from .models import Booking, Details_User, Details_Doctor, Update_Booking, Prescription
 from django import forms
 from django.forms.widgets import DateInput
 from django.utils import timezone
@@ -246,3 +246,13 @@ class PatientsForm(forms.ModelForm):
     }
 
 
+
+class PrescriptionForm(ModelForm):
+    class Meta:
+        model = Prescription
+        fields = '__all__'
+
+        widgets = {
+            'medicine': forms.TextInput(attrs={'class':'form-control','placeholder':'Medicine'}),
+            'dose': forms.TextInput(attrs={'class':'form-control','placeholder':'Dosage'}),
+        }

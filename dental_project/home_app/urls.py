@@ -37,6 +37,7 @@ urlpatterns = [
     path('update_details', views.update_details, name='update_details'),
     path('loginn', views.loginn, name='loginn'),
     path('predict', views.predict, name='predict'),
+    path('prescription', views.prescription, name='prescription'),
     path('doctor_page', views.doctor_page, name='doctor_page'),
     path('doctors_search', views.doctors_search, name='doctors_search'),
     path('services_search', views.services_search, name='services_search'),

@@ -248,7 +248,11 @@ class Update_Booking(models.Model):
     def __str__(self):
         return self.booked_on
 
-
+class Prescription(models.Model):
+    medicine = models.CharField(max_length=30,null=True,blank=True)
+    description = models.TextField(blank=True,null=True,)
+    def __str__(self):
+        return self.medicine
 
 
 
