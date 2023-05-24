@@ -5,6 +5,7 @@ from django.contrib.auth import authenticate, login,logout
 import subprocess
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
+from django.core.mail import EmailMessage
 from django.http import HttpResponse, request
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -12,9 +13,12 @@ from django.shortcuts import redirect
 from django.contrib import auth, messages
 from django.contrib.auth.models import User, Group
 from django.db.models import Q
+from django.template.loader import render_to_string
 from django.views import View
 
 from reportlab.pdfgen import canvas
+
+from django.conf import settings
 
 
 
@@ -25,9 +29,11 @@ from django.views.generic import CreateView
 from scipy.optimize._tstutils import description
 
 from dental_project import settings
-from .forms import BookingForm, Details_UserForm, Details_DoctorForm, RegisterUserForm,Update_BookingForm
+from .forms import BookingForm, Details_UserForm, Details_DoctorForm, RegisterUserForm, Update_BookingForm, \
+    PrescriptionForm, Update_PrescriptionForm
 # from .forms import PatientForm, MedicalHistoryForm, GeneralHealthForm
-from .models import Services, Doctors, Booking, Time_slot, Details_User, Update_Booking, Details_Doctor,Patients
+from .models import Services, Doctors, Booking, Time_slot, Details_User, Update_Booking, Details_Doctor, Prescription, \
+    Update_Prescription, CustomUser, Patients
 from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import PatientsForm
@@ -156,6 +162,9 @@ def booking(request):
             booking = Booking(doc_name=doc_name, booking_date=booking_date, time_slot=time_slot,
                               description=description)
             booking.save()
+            # a=CustomUser.email
+            # print(a)
+            # send_confirmation_email(booking)
             messages.info(request, 'New booking added successfully')
             booking_info=Booking.objects.filter()
             return render(request, 'my_bookings.html',{
@@ -169,6 +178,23 @@ def booking(request):
         form=BookingForm
     return render(request,'booking.html',{'form':form})
 
+
+# def send_confirmation_email(booking):
+#     # Render the email template with appointment details
+#
+#     email_html = render_to_string('appointment_confirmation_email.html', {'booking': booking})
+#     # Create the email message
+#     email = EmailMessage(
+#         subject='Appointment Confirmation',
+#         body=email_html,
+#         from_email=settings.EMAIL_HOST_USER,
+#         to=['archakrishnan22@gmail.com']
+#         # to=[booking.user.email]
+#     )
+#
+#     # Send the email
+#     email.content_subtype = 'html'
+#     email.send()
 
 
 def doctors(request):
@@ -510,6 +536,7 @@ def view_receipt(request,id):
 
     return response
 def view_receipts(request):
+
     data = Booking.objects.get()
     # Get the booking details from the request
     doc_name_id = data.doc_name_id
@@ -521,11 +548,16 @@ def view_receipts(request):
     doctor=Doctors.objects.get(id=doc_name_id)
     time_slot = Time_slot.objects.get(id=time_slot_id)
 
+    # medicine = Prescription.objects.get(id=prescription_id)
+    # dosage = pres.dosage
+    # instruction = pres.instruction
+
     # Create a booking object with the details
     booking = Booking(doc_name_id=doctor,booked_on =booked_on,
                       booking_date=booking_date, time_slot_id=time_slot,
                       description=description)
 
+    # prescrip = Prescription(medicine=medicine,dosage=dosage,instruction=instruction)
     # Create a PDF file object
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="booking.pdf"'
@@ -547,8 +579,11 @@ def view_receipts(request):
     p.drawString(100, 550, f"Booked on: {booking.booked_on}")
     p.drawString(100, 500, f"Time slot: {booking.time_slot_id}")
     p.drawString(100, 450, f"Description: {booking.description}")
-    p.drawString(100, 400, f"Fee: 120/-")
-    p.drawString(100, 350, f"Payment Status: Success")
+    p.drawString(100, 400, f"Medicine: {prescrip.medicine}")
+    p.drawString(100, 350, f"Dosage: {prescrip.dosage}")
+    p.drawString(100, 300, f"Instructions: {prescrip.instruction}")
+    p.drawString(100, 250, f"Fee: 120/-")
+    p.drawString(100, 200, f"Payment Status: Success")
     p.showPage()
     p.save()
 
@@ -565,3 +600,129 @@ class patient_form(View):
         if form.is_valid():
             form.save()
             return render(request,'patient_form.html',{'form':form})
+
+def patient_form(request):
+    if request.method == "POST":
+        form = PatientsForm(request.POST)
+        if form.is_valid():
+            gender=form.cleaned_data['gender']
+            blood_group = form.cleaned_data['blood_group']
+            date_of_birth = form.cleaned_data['date_of_birth']
+            previous_report = form.cleaned_data['previous_report']
+            supplements = form.cleaned_data['supplements']
+            health_issues = form.cleaned_data['health_issues']
+            allergies = form.cleaned_data['allergies']
+            smoker = form.cleaned_data['smoker']
+            beverages = form.cleaned_data['beverages']
+            claustrophobic = form.cleaned_data['claustrophobic']
+            pain = form.cleaned_data['pain']
+            photo1 = form.cleaned_data['photo1']
+            photo2 = form.cleaned_data['photo2']
+            photo3 = form.cleaned_data['photo3']
+            patient_form = Patients(gender=gender, blood_group=blood_group, date_of_birth=date_of_birth,
+                                        previous_report=previous_report, supplements=supplements, health_issues=health_issues,
+                                        allergies=allergies, smoker=smoker, beverages=beverages,claustrophobic=claustrophobic,
+                                        pain=pain,photo1=photo1,photo2=photo2,photo3=photo3)
+            patient_form.save()
+            messages.info(request, 'Consultation form successfully')
+            consultation_info=Patients.objects.filter()
+            return render(request, 'consultation_view.html',{
+                'info':consultation_info,
+                'gender':gender,
+                'blood_group':blood_group,
+                'date_of_birth':date_of_birth,
+                'previous_report': previous_report,
+                'supplements': supplements,
+                'health_issues': health_issues,
+                'allergies': allergies,
+                'smoker': smoker,
+                'beverages': beverages,
+                'claustrophobic': claustrophobic,
+                'pain': pain,
+                'photo1': photo1,
+                'photo2': photo2,
+                'photo3': photo3,
+
+        })
+    else:
+        form=PatientsForm
+    return render(request,'patient_form.html',{'form':form})
+
+
+def prescription(request):
+    if request.method == 'POST':
+        form = PrescriptionForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('my_prescription')
+    else:
+        form = PrescriptionForm()
+    return render(request, 'prescription.html', {'form': form})
+
+
+# def prescription(request):
+#     if request.method == "POST":
+#         form = PrescriptionForm(request.POST)
+#         if form.is_valid():
+#             medicine=form.cleaned_data['medicine']
+#             dosage = form.cleaned_data['dosage']
+#             instruction = form.cleaned_data['instruction']
+#             prescription = Prescription(medicine=medicine, dosage=dosage, instruction=instruction)
+#             prescription.save()
+#             messages.info(request, 'Prescription added successfully')
+#             prescription_info=Prescription.objects.filter()
+#             return render(request, 'my_prescription.html',{
+#                 'info':prescription_info,
+#                 'medicine':medicine,
+#                 'dosage':dosage,
+#                 'instruction':instruction,
+#         })
+#     else:
+#         form=PrescriptionForm
+#     return render(request,'prescription.html',{'form':form})
+
+def my_prescription(request):
+    # if request.method == "POST":
+    #     form = PrescriptionForm(request.POST)
+    #     if form.is_valid():
+    #         medicine = form.cleaned_data['medicine']
+    #         dosage = form.cleaned_data['dosage']
+    #         instruction = form.cleaned_data['instruction']
+    #         prescription = Prescription(medicine=medicine, dosage=dosage, instruction=instruction)
+    #         prescription.save()
+    #         messages.info(request, 'Prescription added successfully')
+            prescription_info = Prescription.objects.filter()
+            return render(request, 'my_prescription.html', {
+                'info': prescription_info})
+    #             'medicine': medicine,
+    #             'dosage': dosage,
+    #             'instruction': instruction,
+    #         })
+    # if request.user.is_authenticated:
+    #     prescription_info = Prescription.objects.all()
+    #     return render(request, "prescription.html",{
+    #         'info':prescription_info,
+    #     })
+    # return redirect('prescription')
+
+
+def update_prescription(request):
+    if request.method == "POST":
+        form = Update_PrescriptionForm(request.POST)
+        if form.is_valid():
+            medicine = form.cleaned_data['medicine']
+            dosage = form.cleaned_data['dosage']
+            instruction = form.cleaned_data['instruction']
+            prescription = Update_Prescription(medicine=medicine, dosage=dosage, instruction=instruction)
+            prescription.save()
+            messages.info(request, 'Prescription added successfully')
+            prescription_info = Update_Prescription.objects.filter()
+            return render(request, 'my_prescription.html', {
+                'info': prescription_info,
+                'medicine': medicine,
+                'dosage': dosage,
+                'instruction': instruction,
+            })
+    else:
+        form = PrescriptionForm
+    return render(request, 'prescription.html', {'form': form})

@@ -7,13 +7,13 @@ from django.forms import ModelForm
 from django.core import validators
 
 from . import models
-from .models import Booking, Details_User, Details_Doctor, Update_Booking, Prescription
+from .models import Booking, Details_User, Details_Doctor, Update_Booking, Prescription, Update_Prescription
 from django import forms
 from django.forms.widgets import DateInput
 from django.utils import timezone
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .models import CustomUser
+
 
 from .models import Patients
 # class CustomDateInput(DateInput):
@@ -221,18 +221,18 @@ PAIN_CHOICES = [
     ('high', 'high'),
 ]
 class PatientsForm(forms.ModelForm):
-    Gender = forms.ChoiceField(choices=GENDER_CHOICES, widget=forms.RadioSelect)
-    Blood_group = forms.ChoiceField(choices=BLOOD_GROUP_CHOICES,widget=forms.RadioSelect)
-    Supplements =forms.MultipleChoiceField(label='Do you take any of the following health/dietry supplements?',
+    gender = forms.ChoiceField(choices=GENDER_CHOICES, widget=forms.RadioSelect)
+    blood_group = forms.ChoiceField(choices=BLOOD_GROUP_CHOICES,widget=forms.RadioSelect)
+    supplements =forms.MultipleChoiceField(label='Do you take any of the following health/dietry supplements?',
                                            choices=SUPPLIMENT_CHOICES,widget=forms.CheckboxSelectMultiple)
-    Health_issues = forms.MultipleChoiceField(label='Have you ever experienced any of these health conditions in the past or present?',
+    health_issues = forms.MultipleChoiceField(label='Have you ever experienced any of these health conditions in the past or present?',
                                            choices=ISSUES_CHOICES,widget=forms.CheckboxSelectMultiple)
-    Allergies = forms.MultipleChoiceField(label='Have any Allegies?',
+    allergies = forms.MultipleChoiceField(label='Have any Allegies?',
                                            choices=ALLERGY_CHOICES,widget=forms.CheckboxSelectMultiple)
-    Smoker = forms.ChoiceField(choices=SMOKER_CHOICES,widget=forms.RadioSelect,label='Are you a Smoker?')
-    Beverages = forms.ChoiceField(choices=BEVARAGE_CHOICES,widget=forms.RadioSelect,label='Do you drink more than 4 caffeinated beverages a day?')
-    Claustrophobic = forms.ChoiceField(choices=CLAUSTROPHOBIC_CHOICES,widget=forms.RadioSelect,label='Have you ever experienced claustrophobic?')
-    Pain = forms.ChoiceField(choices=PAIN_CHOICES,widget=forms.RadioSelect,label='Rate your tolerence in pain?')
+    smoker = forms.ChoiceField(choices=SMOKER_CHOICES,widget=forms.RadioSelect,label='Are you a Smoker?')
+    beverages = forms.ChoiceField(choices=BEVARAGE_CHOICES,widget=forms.RadioSelect,label='Do you drink more than 4 caffeinated beverages a day?')
+    claustrophobic = forms.ChoiceField(choices=CLAUSTROPHOBIC_CHOICES,widget=forms.RadioSelect,label='Have you ever experienced claustrophobic?')
+    pain = forms.ChoiceField(choices=PAIN_CHOICES,widget=forms.RadioSelect,label='Rate your tolerence in pain?')
 
     class Meta:
         model = Patients
@@ -247,12 +247,23 @@ class PatientsForm(forms.ModelForm):
 
 
 
-class PrescriptionForm(ModelForm):
+class PrescriptionForm(forms.ModelForm):
     class Meta:
         model = Prescription
         fields = '__all__'
 
+        # widgets = {
+        #     'medicine': forms.TextInput(attrs={'class':'form-control','placeholder':'Medicine'}),
+        #     'dose': forms.TextInput(attrs={'class':'form-control','placeholder':'Dosage'}),
+        # }
+
+class Update_PrescriptionForm(forms.ModelForm):
+    class Meta:
+        model = Update_Prescription
+        fields = '__all__'
+
         widgets = {
-            'medicine': forms.TextInput(attrs={'class':'form-control','placeholder':'Medicine'}),
-            'dose': forms.TextInput(attrs={'class':'form-control','placeholder':'Dosage'}),
+            'medicine': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Medicine'}),
+            'dose': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Dosage'}),
         }
+

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Services, Doctors, Booking, Patients, Appointment, Time_slot, Details_User, Details_Doctor,Patients
+from .models import Services, Doctors, Booking, Patients, Appointment, Time_slot, Details_User, Details_Doctor,Patients,Prescription
 from django.contrib.auth.models import Group
 # Register your models here.
 
@@ -34,3 +34,8 @@ class PatientsModelAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Patients)
+
+class PrescriptionAdmin(admin.ModelAdmin):
+    list_display = ('medicine','dosage','description')
+
+admin.site.register(Prescription)

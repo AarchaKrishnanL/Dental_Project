@@ -61,6 +61,7 @@
          <th scope="col">Details</th>
         <th scope="col">Payment Status</th>
         <th scope="col">Appointment Status</th>
+        <th scope="col">Prescription</th>
         <th scope="col">Report</th>
 
 
@@ -82,6 +83,10 @@
         </td>
         <td><i class="fa fa-check-square" style="font-size:30px;color:green"></i></td>
         <td> <button id="myButton" onclick="changeTextAndColor()">Pending!!</button></td>
+        <td>
+            <a href="{% url 'prescription' %}" >
+<button type="submit" onclick="login" name="receiptdownload" class="btn btn-warning" style="text-align: center;font-size:10px;background-color:#fcb13b; color:rgba(0, 0, 0, 0.87);padding:10px;border:none;  box-shadow: 0 2px 4px rgba(0, 0, 0, .6);">
+    Add Prescription</button> </a></td>
         <td>
             <a href="{% url 'view_receipt' i.id %}" >
 <button type="submit" onclick="login" name="receiptdownload" class="btn btn-warning" style="text-align: center;font-size:10px;background-color:#fcb13b; color:rgba(0, 0, 0, 0.87);padding:10px;border:none;  box-shadow: 0 2px 4px rgba(0, 0, 0, .6);">

@@ -1,3 +1,4 @@
+
 {% load static %}
 <html lang="en">
 <head>
@@ -24,36 +25,26 @@
           {% endif %}
         </nav>
     </header>
-<!--<br><br>-->
-<!--<div class="container">-->
-<!--    {% for msg in messages %}-->
-<!--<div class="alert alert-warning" role="alert">-->
-<!--    {{msg}}-->
-<!--</div>-->
-<!--{% endfor %}-->
-<!--</div>-->
-<center><h2>Form Details</h2>
+<br><br>
+<div class="container">
+    {% for msg in messages %}
+<div class="alert alert-warning" role="alert">
+    {{msg}}
+</div>
+{% endfor %}
+</div>
+<center><h2>Prescription</h2>
 
     {% if info %}
 <table class="table table-hover" style="width:60%">
-<!--<h1>dfgh</h1>-->
+
  <thead>
     <tr>
 
-        <th scope="col">Gender</th>
-        <th scope="col">BloodGroup</th>
-        <th scope="col">DOB</th>
-        <th scope="col">Previous Report</th>
-        <th scope="col">Suppliments</th>
-        <th scope="col">Health Condition</th>
-        <th scope="col">Allegies</th>
-        <th scope="col">Smoker</th>
-        <th scope="col">Caffeinates</th>
-        <th scope="col">Claustrophobic</th>
-        <th scope="col">Pain Tolerence</th>
-        <th scope="col">Photo1</th>
-        <th scope="col">Photo2</th>
-        <th scope="col">Photo3</th>
+        <th scope="col">Medicine</th>
+        <th scope="col">Dosage</th>
+        <th scope="col">Instruction</th>
+        <th scope="col">Actions</th>
 
     </tr>
   </thead>
@@ -61,57 +52,29 @@
   {% for i in info %}
     <tr>
 
-        <td>Female</td>
-        <td>O+ve</td>
-        <td>12/05/1999</td>
-         <td>None</td>
-        <td>Omega3,Zinc</td>
-        <td>Hormone Imbalance,Diabetes</td>
-        <td>Latex</td>
-        <td>NO</td>
-        <td>NO</td>
-        <td>NO</td>
-        <td>Medium</td>
-        <td>None</td>
-       <td>None</td>
-       <td>None</td>
-
-<!--                <td>{{i.gender}}</td>-->
-<!--        <td>{{i.blood_group}}</td>-->
-<!--        <td>{{i.date_of_birth}}</td>-->
-<!--         <td>{{i.previous_report}}</td>-->
-<!--        <td>{{i.supplements}}</td>-->
-<!--        <td>{{i.allergies}}</td>-->
-<!--        <td>{{i.smoker}}</td>-->
-<!--        <td>{{i.beverages}}</td>-->
-<!--        <td>{{i.claustrophobic}}</td>-->
-<!--        <td>{{i.pain}}</td>-->
-<!--        <td>{{i.photo1}}</td>-->
-<!--        <td>{{i.photo2}}</td>-->
-<!--       <td>{{i.photo3}}</td>-->
-
+        <td>{{i.medicine}}</td>
+        <td>{{i.dosage}}</td>
+        <td>{{i.instruction}}</td>
     <!--<td><span class="badge text-bg-dark">{{i.status}}</span></td>!-->
-<!--        <td>-->
-<!--            <a href="{% url 'update_booking' %}" class="edit" data-toggle="modal">-->
-<!--                <i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i></a>-->
-<!--            <a href="/delete/{{i.id}}" class="delete" data-toggle="modal">-->
-<!--                <i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a>-->
-<!--                <a href="{% url 'payment' %}">-->
-<!--              <button type="submit" onclick="login" name="submit" class="btn btn-warning ml-auto">-->
-<!--              Payment</button> </a>-->
-<!--        </td>-->
+        <td>
+            <a href="{% url 'update_prescription' %}" class="edit" data-toggle="modal">
+                <i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i></a>
+            <a href="my_prescription" class="delete" data-toggle="modal">
+                <i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a>
     </tr>
-<!--  {% endfor %}-->
+  {% endfor %}
   </tbody>
-
+ {% endif %}
 </table>
-
-<strong>Note :</strong>
-This appointment hasn't been set yet. We will contact you shortly to confirm your appointment.
-<!--    {% else %}-->
-<!--    <h4 class="text-center alert alert-warning">No records</h4>-->
-    {% endif %}
 </center>
+    <button onclick="goBack()">Go Back</button>
+
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+
 
 </body>
 

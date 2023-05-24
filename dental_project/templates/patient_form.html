@@ -24,9 +24,9 @@
        </div>
      {% endfor %}
 <!--     <input type="submit" value="Submit" class="btn btn-primary">-->
-     <a href="{% url 'booking' %}">
+<!--     <a href="{% url 'booking' %}">-->
               <button type="submit" value="Submit" class="btn btn-primary">
-              SUBMIT FORM</button> </a>
+              SUBMIT FORM</button>
      {% if form.non_field_errors %}
        {% for error in form.non_field_errors %}
         <p class="alert alert-danger my-3">{{error}}</p>

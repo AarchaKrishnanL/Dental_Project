@@ -49,7 +49,7 @@ class Time_slot(models.Model):
 
 
 class Booking(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE,null=True,blank=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,null=True,blank=True)
     doc_name= models.ForeignKey(Doctors,on_delete=models.CASCADE,null=True,blank=True)
     booking_date = models.DateField()
     booked_on = models.DateField(auto_now=True)
@@ -179,7 +179,7 @@ class Patients(models.Model):
 
 
 class Appointment(models.Model):
-    booked_user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, blank=True,null=True)
+    booked_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True,null=True)
     # user = models.ForeignKey(User,on_delete=models.CASCADE)
     doctor = models.ForeignKey(Doctors,on_delete=models.CASCADE)
     # ser_name = models.ForeignKey(allservices, on_delete=models.CASCADE)
@@ -248,12 +248,40 @@ class Update_Booking(models.Model):
     def __str__(self):
         return self.booked_on
 
+
+
 class Prescription(models.Model):
-    medicine = models.CharField(max_length=30,null=True,blank=True)
-    description = models.TextField(blank=True,null=True,)
+    medications = models.TextField(null=True,blank=True)
+    dosage = models.CharField(max_length=50,null=True,blank=True)
+    date_of_prescription = models.DateField(null=True,blank=True)
+    oral_findings = models.TextField(null=True,blank=True)
+    diagnosis = models.TextField(null=True,blank=True)
+    treatment_plan = models.TextField(null=True,blank=True)
+    duration = models.CharField(max_length=50,null=True,blank=True)
+    post_treatment = models.TextField(null=True,blank=True)
+    dietary_restrictions = models.TextField(null=True,blank=True)
+    follow_up_date = models.DateTimeField(null=True,blank=True)
+    remarks = models.TextField(null=True,blank=True)
+
     def __str__(self):
-        return self.medicine
+        return self.remarks
 
 
 
+
+# class Prescription(models.Model):
+#     medicine = models.CharField(max_length=30,null=True,blank=True)
+#     dosage = models.CharField(max_length=30, null=True, blank=True)
+#     instruction = models.TextField(blank=True,null=True)
+#
+#     def __str__(self):
+#         return self.dosage
+
+class Update_Prescription(models.Model):
+    medicine = models.CharField(max_length=30,null=True,blank=True)
+    dosage = models.CharField(max_length=30, null=True, blank=True)
+    instruction = models.TextField(max_length=30,blank=True,null=True)
+
+    def __str__(self):
+         return self.dosage
 
