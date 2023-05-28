@@ -182,9 +182,7 @@ def booking(request):
             booking = Booking(doc_name=doc_name, booking_date=booking_date, time_slot=time_slot,
                               description=description)
             booking.save()
-            # a=CustomUser.email
-            # print(a)
-            # send_confirmation_email(booking)
+            send_confirmation_email(booking)
             messages.info(request, 'New booking added successfully')
             booking_info=Booking.objects.filter()
             return render(request, 'my_bookings.html',{
@@ -199,22 +197,22 @@ def booking(request):
     return render(request,'booking.html',{'form':form})
 
 
-# def send_confirmation_email(booking):
-#     # Render the email template with appointment details
-#
-#     email_html = render_to_string('appointment_confirmation_email.html', {'booking': booking})
-#     # Create the email message
-#     email = EmailMessage(
-#         subject='Appointment Confirmation',
-#         body=email_html,
-#         from_email=settings.EMAIL_HOST_USER,
-#         to=['archakrishnan22@gmail.com']
-#         # to=[booking.user.email]
-#     )
-#
-#     # Send the email
-#     email.content_subtype = 'html'
-#     email.send()
+def send_confirmation_email(booking):
+    # Render the email template with appointment details
+
+    email_html = render_to_string('appointment_confirmation_email.html', {'booking': booking})
+    # Create the email message
+    email = EmailMessage(
+        subject='Appointment Confirmation',
+        body=email_html,
+        from_email=settings.EMAIL_HOST_USER,
+        to=['archakrishnan22@gmail.com']
+        # to=[booking.user.email]
+    )
+
+    # Send the email
+    email.content_subtype = 'html'
+    email.send()
 
 
 def doctors(request):
@@ -864,4 +862,66 @@ def service_reviews_graph(request):
 
     # Specify the file path for saving the chart image
     # file_path = os.path.join(settings.STATIC_ROOT, 'charts/chart.png')
+
+
+import io
+import urllib.parse
+from django.http import HttpResponse
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+import tempfile
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+
+def generate_service_reviews_report(request):
+    services = Services.objects.all()
+
+    service_names = []
+    average_ratings = []
+
+    for service in services:
+        reviews = Review.objects.filter(service=service)
+
+        if reviews:
+            total_ratings = sum(review.rate for review in reviews)
+            average_rating = total_ratings / len(reviews)
+        else:
+            average_rating = 0
+
+        service_names.append(service.ser_name)
+        average_ratings.append(average_rating)
+
+    plt.bar(service_names, average_ratings)
+    plt.xlabel('Services')
+    plt.ylabel('Average Rating')
+    plt.title('Average Ratings for Services')
+    plt.ylim(0, 5)
+    plt.xticks(rotation=45)
+
+    # Save the plot as an image file
+    with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as temp_file:
+        plt.savefig(temp_file.name)
+
+    # Create a PDF report
+    pdf_buffer = io.BytesIO()
+    canvas_obj = canvas.Canvas(pdf_buffer, pagesize=letter)
+    canvas_obj.drawImage(temp_file.name, 50, 50, width=500, height=300)
+    canvas_obj.showPage()
+    canvas_obj.save()
+
+    # Close and remove the temporary image file
+    plt.close()
+    os.remove(temp_file.name)
+
+    # Set the response content type as PDF
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="service_reviews_report.pdf"'
+
+    # Write the PDF buffer to the response
+    response.write(pdf_buffer.getvalue())
+    pdf_buffer.close()
+
+    return response
+
+
 
