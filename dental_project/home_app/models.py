@@ -251,6 +251,7 @@ class Update_Booking(models.Model):
 
 
 class Prescription(models.Model):
+    booking_id = models.ForeignKey(Booking,on_delete=models.CASCADE,null=True,blank=True)
     medications = models.TextField(null=True,blank=True)
     dosage = models.CharField(max_length=50,null=True,blank=True)
     date_of_prescription = models.DateField(null=True,blank=True)
@@ -269,19 +270,28 @@ class Prescription(models.Model):
 
 
 
-# class Prescription(models.Model):
-#     medicine = models.CharField(max_length=30,null=True,blank=True)
-#     dosage = models.CharField(max_length=30, null=True, blank=True)
-#     instruction = models.TextField(blank=True,null=True)
-#
-#     def __str__(self):
-#         return self.dosage
 
-class Update_Prescription(models.Model):
-    medicine = models.CharField(max_length=30,null=True,blank=True)
-    dosage = models.CharField(max_length=30, null=True, blank=True)
-    instruction = models.TextField(max_length=30,blank=True,null=True)
 
-    def __str__(self):
-         return self.dosage
+from django.db import models
+from django.contrib.auth.models import User
 
+class Review(models.Model):
+    service = models.ForeignKey(Services, on_delete=models.CASCADE, related_name='reviews',null=True,blank=True)
+    rate = models.PositiveIntegerField(null=True,blank=True)
+    comment = models.TextField(null=True,blank=True)
+
+
+
+class ReviewRating(models.Model):
+    service = models.ForeignKey(Services, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    subject = models.CharField(max_length=100, blank=True)
+    review = models.TextField(max_length=500, blank=True)
+    rating = models.FloatField()
+    ip = models.CharField(max_length=20, blank=True)
+    status = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def _str_(self):
+        return self.subject

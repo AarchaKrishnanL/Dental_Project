@@ -15,8 +15,18 @@ from django.contrib.auth.models import User, Group
 from django.db.models import Q
 from django.template.loader import render_to_string
 from django.views import View
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+from reportlab.pdfgen import canvas
 
 from reportlab.pdfgen import canvas
+from reportlab.platypus import Table
+
+from django.shortcuts import get_object_or_404
+from datetime import datetime
 
 from django.conf import settings
 
@@ -26,14 +36,19 @@ from tkinter import *
 import os
 
 from django.views.generic import CreateView
+from reportlab.platypus import TableStyle
 from scipy.optimize._tstutils import description
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+from reportlab.pdfgen import canvas
 
 from dental_project import settings
 from .forms import BookingForm, Details_UserForm, Details_DoctorForm, RegisterUserForm, Update_BookingForm, \
-    PrescriptionForm, Update_PrescriptionForm
+    PrescriptionForm, ReviewForm
 # from .forms import PatientForm, MedicalHistoryForm, GeneralHealthForm
 from .models import Services, Doctors, Booking, Time_slot, Details_User, Update_Booking, Details_Doctor, Prescription, \
-    Update_Prescription, CustomUser, Patients
+    CustomUser, Patients, Review, ReviewRating
 from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import PatientsForm
@@ -209,12 +224,9 @@ def contact(request):
 
 
 def services(request):
-    dict_services={
-        'services':Services.objects.all()
-    }
-    return render(request, "services.html",dict_services)
-
-
+    services = Services.objects.all()
+    context = {'services': services}
+    return render(request, 'services.html', context)
 
 
 def user_login(request):
@@ -491,52 +503,8 @@ def doctor_bookings(request):
     return redirect('booking')
 
 
-def view_receipt(request,id):
-    data = Booking.objects.get(id=id)
-    # Get the booking details from the request
-    doc_name_id = data.doc_name_id
-    booking_date = data.booking_date
-    booked_on = data.booked_on
-    time_slot_id = data.time_slot_id
-    description = data.description
-    print(doc_name_id )
-    doctor=Doctors.objects.get(id=doc_name_id)
-    time_slot = Time_slot.objects.get(id=time_slot_id)
 
-    # Create a booking object with the details
-    booking = Booking(doc_name_id=doctor,booked_on =booked_on,
-                      booking_date=booking_date, time_slot_id=time_slot,
-                      description=description)
-
-    # Create a PDF file object
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="booking.pdf"'
-
-    # Create a canvas object and write the PDF content
-    p = canvas.Canvas(response)
-
-    p.setFillColorRGB(0.5, 0.5, 1)  # Set background color to light blue
-    p.rect(0, 0, 612, 1000, fill=True)  # Draw a rectangle to fill the entire page
-
-    p.setFont("Helvetica-Bold", 36)  # Set font type and size
-    p.setFillColorRGB(0, 0, 0)  # Set text color to red
-    p.drawString(100, 750, "Receipt")  # Draw the "Receipt" text
-    p.setFont("Helvetica-Bold", 12)  # Set font type and size for the remaining text
-    p.setFillColorRGB(0, 0, 0)  # Set text color to black
-    p.drawString(100, 700, f"Patient Name: Maaya Krishna")
-    p.drawString(100, 650, f"Doctor: {booking.doc_name_id}")
-    p.drawString(100, 600, f"Booking date: {booking.booking_date}")
-    p.drawString(100, 550, f"Booked on: {booking.booked_on}")
-    p.drawString(100, 500, f"Time slot: {booking.time_slot_id}")
-    p.drawString(100, 450, f"Description: {booking.description}")
-    p.drawString(100, 400, f"Fee: 120/-")
-    p.drawString(100, 350, f"Payment Status: Success")
-    p.showPage()
-    p.save()
-
-    return response
-def view_receipts(request):
-
+def view_receipt(request, booking_id):
     data = Booking.objects.get()
     # Get the booking details from the request
     doc_name_id = data.doc_name_id
@@ -548,47 +516,190 @@ def view_receipts(request):
     doctor=Doctors.objects.get(id=doc_name_id)
     time_slot = Time_slot.objects.get(id=time_slot_id)
 
-    # medicine = Prescription.objects.get(id=prescription_id)
-    # dosage = pres.dosage
-    # instruction = pres.instruction
-
     # Create a booking object with the details
     booking = Booking(doc_name_id=doctor,booked_on =booked_on,
                       booking_date=booking_date, time_slot_id=time_slot,
                       description=description)
 
-    # prescrip = Prescription(medicine=medicine,dosage=dosage,instruction=instruction)
+    dataa = Prescription.objects.get()
+    # Get the booking details from the request
+    medications = dataa.medications
+    dosage = dataa.dosage
+    oral_findings =dataa.oral_findings
+    diagnosis = dataa.diagnosis
+    treatment_plan=dataa.treatment_plan
+    duration=dataa.duration
+    post_treatment=dataa.post_treatment
+    dietary_restrictions=dataa.dietary_restrictions
+    remarks=dataa.remarks
+    # medications=Prescription.objects.get()
+
+    # Create a booking object with the details
+    prescription = Prescription(medications=medications,dosage =dosage,oral_findings=oral_findings,diagnosis=diagnosis,
+                                treatment_plan=treatment_plan,duration=duration,post_treatment=post_treatment,
+                                dietary_restrictions=dietary_restrictions,remarks=remarks)
+
     # Create a PDF file object
     response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="booking.pdf"'
+    response['Content-Disposition'] = 'attachment; filename="booking.pdf"'
 
     # Create a canvas object and write the PDF content
-    p = canvas.Canvas(response)
+    p = canvas.Canvas(response, pagesize=letter)
 
+    # Set background color
     p.setFillColorRGB(0.5, 0.5, 1)  # Set background color to light blue
-    p.rect(0, 0, 612, 1000, fill=True)  # Draw a rectangle to fill the entire page
+    p.rect(0, 0, 612, 792, fill=True)  # Draw a rectangle to fill the entire page
 
-    p.setFont("Helvetica-Bold", 36)  # Set font type and size
-    p.setFillColorRGB(0, 0, 0)  # Set text color to red
-    p.drawString(100, 750, "Receipt")  # Draw the "Receipt" text
-    p.setFont("Helvetica-Bold", 12)  # Set font type and size for the remaining text
-    p.setFillColorRGB(0, 0, 0)  # Set text color to black
-    p.drawString(100, 700, f"Patient Name: Maaya Krishna")
-    p.drawString(100, 650, f"Doctor: {booking.doc_name_id}")
-    p.drawString(100, 600, f"Booking date: {booking.booking_date}")
-    p.drawString(100, 550, f"Booked on: {booking.booked_on}")
-    p.drawString(100, 500, f"Time slot: {booking.time_slot_id}")
-    p.drawString(100, 450, f"Description: {booking.description}")
-    p.drawString(100, 400, f"Medicine: {prescrip.medicine}")
-    p.drawString(100, 350, f"Dosage: {prescrip.dosage}")
-    p.drawString(100, 300, f"Instructions: {prescrip.instruction}")
-    p.drawString(100, 250, f"Fee: 120/-")
-    p.drawString(100, 200, f"Payment Status: Success")
+    # Set font type and size for the title
+    p.setFont("Helvetica-Bold", 36)
+    p.setFillColorRGB(0, 0, 0)
+    p.drawString(100, 750, "Receipt")
+
+    # Set font type and size for the table headings and content
+    p.setFont("Helvetica-Bold", 12)
+
+    # Draw the table for booking details
+    booking_table_data = [
+        ["Booking Details"],  # Add the booking details heading
+        ["Patient Name", "Maaya Krishna"],
+        ["Doctor", str(booking.doc_name_id)],
+        ["Booking date", str(booking.booking_date)],
+        ["Time slot", str(booking.time_slot_id)],
+        ["Description", str(booking.description)],
+        ["Fee", "120/-"],
+        ["Payment Status", "Success"]
+    ]
+    booking_table = Table(booking_table_data, colWidths=[150, 150])
+    booking_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.lightblue),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 12),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black)
+    ]))
+    booking_table.wrapOn(p, 400, 200)
+    booking_table.drawOn(p, 100, 600)
+
+    # Draw the table for prescription details
+    prescription_table_data = [
+        ["Prescription Details"],  # Add the prescription details heading
+        ["Medications", prescription.medications],
+        ["Dosage", prescription.dosage],
+        ["Oral Findings", prescription.oral_findings],
+        ["Diagnosis", prescription.diagnosis],
+        ["Treatment Plan", prescription.treatment_plan],
+        ["Duration", prescription.duration],
+        ["Post Treatment", prescription.post_treatment],
+        ["Dietary Restrictions", prescription.dietary_restrictions],
+        ["Follow Update", prescription.follow_up_date],
+        ["Remarks", prescription.remarks]
+    ]
+    prescription_table = Table(prescription_table_data, colWidths=[150, 150])
+    prescription_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.lightblue),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 12),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black)
+    ]))
+    prescription_table.wrapOn(p, 400, 200)
+    prescription_table.drawOn(p, 100, 350)
+
+    # Save the PDF document
     p.showPage()
     p.save()
 
     return response
 
+
+
+
+
+
+#
+#
+# def view_receipt(request, booking_id):
+#     # Retrieve the booking object
+#     booking = Booking.objects.get(id=booking_id)
+#
+#     # Retrieve the related prescription object for the booking
+#     prescription = get_object_or_404(Prescription, booking_id=booking_id)
+#
+#     # Get the booking details
+#     doc_name_id = booking.doc_name_id
+#     booking_date = booking.booking_date
+#     booked_on = booking.booked_on
+#     time_slot_id = booking.time_slot_id
+#     description = booking.description
+#
+#     # Rest of the code...
+#
+#     # doctor = Doctors.objects.get(id=doc_name_id)
+#     # time_slot = Time_slot.objects.get(id=time_slot_id)
+#
+#     # Get the prescription details
+#     medications = prescription.medications
+#     dosage = prescription.dosage
+#     date_of_prescription = prescription.date_of_prescription
+#     oral_findings = prescription.oral_findings
+#     diagnosis = prescription.diagnosis
+#     treatment_plan = prescription.treatment_plan
+#     duration = prescription.duration
+#     post_treatment = prescription.post_treatment
+#     dietary_restrictions = prescription.dietary_restrictions
+#     follow_up_date = prescription.follow_up_date
+#     remarks = prescription.remarks
+#
+#     # Create a PDF file object
+#     response = HttpResponse(content_type='application/pdf')
+#     response['Content-Disposition'] = f'attachment; filename="booking.pdf"'
+#
+#     # Create a canvas object and write the PDF content
+#     p = canvas.Canvas(response)
+#
+#     p.setFillColorRGB(0.5, 0.5, 1)  # Set background color to light blue
+#     p.rect(0, 0, 612, 1000, fill=True)  # Draw a rectangle to fill the entire page
+#
+#     p.setFont("Helvetica-Bold", 36)  # Set font type and size
+#     p.setFillColorRGB(0, 0, 0)  # Set text color to red
+#     p.drawString(100, 750, "Receipt")  # Draw the "Receipt" text
+#     p.setFont("Helvetica-Bold", 12)  # Set font type and size for the remaining text
+#     p.setFillColorRGB(0, 0, 0)  # Set text color to black
+#     p.drawString(100, 700, f"Patient Name: Maaya Krishna")
+#     p.drawString(100, 650, f"Doctor: {doc_name_id}")
+#     p.drawString(100, 600, f"Booking date: {booking_date}")
+#     p.drawString(100, 550, f"Booked on: {booked_on}")
+#     p.drawString(100, 500, f"Time slot: {time_slot_id}")
+#     p.drawString(100, 450, f"Description: {description}")
+#     p.drawString(100, 400, f"Fee: 120/-")
+#     p.drawString(100, 350, f"Payment Status: Success")
+#
+#     # Include prescription fields
+#     p.drawString(100, 300, f"Medications: {medications}")
+#     p.drawString(100, 280, f"Dosage: {dosage}")
+#     p.drawString(100, 260, f"Date of Prescription: {date_of_prescription}")
+#     p.drawString(100, 240, f"Oral Findings: {oral_findings}")
+#     p.drawString(100, 220, f"Diagnosis: {diagnosis}")
+#     p.drawString(100, 200, f"Treatment Plan: {treatment_plan}")
+#     p.drawString(100, 180, f"Duration: {duration}")
+#     p.drawString(100, 160, f"Post Treatment: {post_treatment}")
+#     p.drawString(100, 140, f"Dietary Restrictions: {dietary_restrictions}")
+#     p.drawString(100, 120, f"Follow-up Date: {follow_up_date.strftime('%Y-%m-%d %H:%M')}")
+#     p.drawString(100, 100, f"Remarks: {remarks}")
+#
+#     p.showPage()
+#     p.save()
+#
+#     return response
+#
+#
+#
 
 
 class patient_form(View):
@@ -660,69 +771,86 @@ def prescription(request):
     return render(request, 'prescription.html', {'form': form})
 
 
-# def prescription(request):
-#     if request.method == "POST":
-#         form = PrescriptionForm(request.POST)
-#         if form.is_valid():
-#             medicine=form.cleaned_data['medicine']
-#             dosage = form.cleaned_data['dosage']
-#             instruction = form.cleaned_data['instruction']
-#             prescription = Prescription(medicine=medicine, dosage=dosage, instruction=instruction)
-#             prescription.save()
-#             messages.info(request, 'Prescription added successfully')
-#             prescription_info=Prescription.objects.filter()
-#             return render(request, 'my_prescription.html',{
-#                 'info':prescription_info,
-#                 'medicine':medicine,
-#                 'dosage':dosage,
-#                 'instruction':instruction,
-#         })
-#     else:
-#         form=PrescriptionForm
-#     return render(request,'prescription.html',{'form':form})
 
 def my_prescription(request):
-    # if request.method == "POST":
-    #     form = PrescriptionForm(request.POST)
-    #     if form.is_valid():
-    #         medicine = form.cleaned_data['medicine']
-    #         dosage = form.cleaned_data['dosage']
-    #         instruction = form.cleaned_data['instruction']
-    #         prescription = Prescription(medicine=medicine, dosage=dosage, instruction=instruction)
-    #         prescription.save()
-    #         messages.info(request, 'Prescription added successfully')
-            prescription_info = Prescription.objects.filter()
-            return render(request, 'my_prescription.html', {
-                'info': prescription_info})
-    #             'medicine': medicine,
-    #             'dosage': dosage,
-    #             'instruction': instruction,
-    #         })
-    # if request.user.is_authenticated:
-    #     prescription_info = Prescription.objects.all()
-    #     return render(request, "prescription.html",{
-    #         'info':prescription_info,
-    #     })
-    # return redirect('prescription')
+    prescriptions = Prescription.objects.all()
+    return render(request, 'my_prescription.html', {'prescriptions': prescriptions})
 
 
-def update_prescription(request):
-    if request.method == "POST":
-        form = Update_PrescriptionForm(request.POST)
+from .models import Prescription
+from .forms import PrescriptionForm
+
+def edit_prescription(request, prescription_id):
+    prescription = Prescription.objects.get(id=prescription_id)
+
+    if request.method == 'POST':
+        form = PrescriptionForm(request.POST, instance=prescription)
         if form.is_valid():
-            medicine = form.cleaned_data['medicine']
-            dosage = form.cleaned_data['dosage']
-            instruction = form.cleaned_data['instruction']
-            prescription = Update_Prescription(medicine=medicine, dosage=dosage, instruction=instruction)
-            prescription.save()
-            messages.info(request, 'Prescription added successfully')
-            prescription_info = Update_Prescription.objects.filter()
-            return render(request, 'my_prescription.html', {
-                'info': prescription_info,
-                'medicine': medicine,
-                'dosage': dosage,
-                'instruction': instruction,
-            })
+            form.save()
+            return redirect('my_prescription')
     else:
-        form = PrescriptionForm
-    return render(request, 'prescription.html', {'form': form})
+        form = PrescriptionForm(instance=prescription)
+
+    return render(request, 'edit_prescription.html', {'form': form})
+
+def delete_prescription(request, prescription_id):
+    prescription = Prescription.objects.get(id=prescription_id)
+    prescription.delete()
+    return redirect('my_prescription')
+
+
+
+# def service_detail(request, id):
+#     ser_name = Services.objects.get(id=id)
+#     reviews = Review.objects.filter(service=ser_name)
+#
+#     return render(request, 'service_detail.html', {'service': ser_name, 'reviews': reviews})
+
+# def service_detail(request, id):
+#     service = Services.objects.get(id=id)
+#     reviews = Review.objects.filter(service=service)
+#
+#     return render(request, 'service_detail.html', {'service': service, 'reviews': reviews})
+#
+#
+#
+#
+#
+# def review_rate(request):
+#     if request.method == 'GET':
+#             ser_id = request.GET('ser_id')
+#             ser_name = Services.objects.get(id=ser_id)
+#             comment = request.GET.get('comment')
+#             rate = request.GET.get('rate')
+#             user = request.user
+#             # Create and save the review object
+#             Review(user=user, ser_name=ser_name, rate=rate, comment=comment).save()
+#  # Redirect to the service detail page or show a success message
+#             return redirect('services', id=ser_id)
+#     else:
+#         form = ReviewForm()
+#
+#     return render(request, 'submit_review.html', {'form': form})
+
+#
+#
+def service_detail(request, service_id):
+    service = Services.objects.get(pk=service_id)
+    if request.method == 'POST':
+        rating = int(request.POST['rating'])
+        comment = request.POST['comment']
+        Review.objects.create(service=service, rating=rating, comment=comment)
+        return redirect('service_detail', service_id=service_id)
+    return render(request, 'services.html', {'services': [service]})
+
+def add_review(request):
+    if request.method == 'POST':
+        service_id = request.POST.get('service')
+        comment = request.POST.get('comment')
+        rate = request.POST.get('rate')
+
+        service = Services.objects.get(id=service_id)
+        review = Review.objects.create(service=service, comment=comment, rate=rate)
+
+    return redirect('services')
+

@@ -1,32 +1,103 @@
-{% extends 'base.html'%}
+{% extends 'base.html' %}
 {% load static %}
+
 {% block content %}
 
 <html>
-    <head>
-        <title>services</title>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width,initial scale=1.0">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
+<head>
+    <title>services</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
 
-        </head>
-        <body>
-            <div class="gallery">
+</head>
+<body>
+<div class="gallery">
+  {% for service in services %}
+  <div class="content">
+    <!-- Service details -->
+    <img src="{{ service.ser_image.url }}">
+    <h3>{{ service.ser_name }}</h3>
+    <p>{{ service.ser_description }}</p>
+
+    <!-- Reviews section -->
+    <div class="reviews">
+      <h4>Reviews:</h4>
+      {% for review in service.reviews.all %}
+      <div class="review">
+        <p>{{ review.comment }}</p>
+        <p class="rating">(Rating: {{ review.rate }}/5)</p>
+      </div>
+      {% empty %}
+      <p>No reviews yet.</p>
+      {% endfor %}
+    </div>
+
+    <!-- Review form -->
+<div class="col-sm-5 mt-2 review-form-wrapper">
+  <h5 class="text-uppercase font-weight-bold">Write your review</h5>
+  <form class="review-form" method="POST" action="{% url 'add_review' %}">
+    {% csrf_token %}
+    <input type="hidden" name="service" value="{{ service.id }}">
+    <div class="form-group">
+      <textarea cols="input" type="text" name="comment" placeholder="Your review"></textarea>
+    </div>
+    <div class="form-group">
+      <div class="input rating">
+        <p class="text-uppercase font-weight-bold">Your Rating</p>
+        <div class="rating-wrapper">
+          <input type="radio" id="star-5" name="rate" value="1" /><label for="star-5"
+                                                                      class="fas fa-star"></label>
+          <input type="radio" id="star-4" name="rate" value="2" /><label for="star-4"
+                                                                      class="fas fa-star"></label>
+          <input type="radio" id="star-3" name="rate" value="3" /><label for="star-3"
+                                                                      class="fas fa-star"></label>
+          <input type="radio" id="star-2" name="rate" value="4" /><label for="star-2"
+                                                                      class="fas fa-star"></label>
+          <input type="radio" id="star-1" name="rate" value="5" /><label for="star-1"
+                                                                      class="fas fa-star"></label>
+        </div>
+      </div>
+    </div>
+    <button type="submit">Submit</button>
+  </form>
+</div>
+
+  </div>
+  {% endfor %}
+</div>
 
 
+<script>
+    function submitForm(star) {
+        star.parentNode.submit();
+    }
+</script>
 
-{% for s in services %}
-                        <div class="content">
-                            <img src="{{s.ser_image.url}}">
-                            <h3>{{s.ser_name}}</h3>
-                            <p>{{s.ser_description}}</p>
+<style>
+.review-form-wrapper {
+    margin: 0 auto;
+    text-align: center;
+  }
+  .reviews {
+    margin-top: 20px;
+    color: #181b26;
+  }
 
+  .review {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
 
-                                </div>
-{% endfor %}
+  .review p {
+    margin: 0;
+    color: #cb485d;
+  }
 
-                    </div>
- <style>
+  .rating {
+    color: #cb485d;
+  }
     body{
     margin: 0;
     font-family: sans-serif;
@@ -113,7 +184,7 @@ li{
 }
 button{
     text-align: center;
-    font-size: 24px;
+    font-size: 20px;
     color:#ff9f43;
     width:100%;
     padding: 15px;
@@ -141,8 +212,9 @@ button{
         .content{
             width: 100px;
         }
-}</style>
-        </body>
-        </html>
+}
+</style>
+</body>
+</html>
 
 {% endblock content %}

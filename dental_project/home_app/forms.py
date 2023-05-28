@@ -7,7 +7,7 @@ from django.forms import ModelForm
 from django.core import validators
 
 from . import models
-from .models import Booking, Details_User, Details_Doctor, Update_Booking, Prescription, Update_Prescription
+from .models import Booking, Details_User, Details_Doctor, Update_Booking, Prescription, Review
 from django import forms
 from django.forms.widgets import DateInput
 from django.utils import timezone
@@ -257,13 +257,23 @@ class PrescriptionForm(forms.ModelForm):
         #     'dose': forms.TextInput(attrs={'class':'form-control','placeholder':'Dosage'}),
         # }
 
-class Update_PrescriptionForm(forms.ModelForm):
+# class Update_PrescriptionForm(forms.ModelForm):
+#     class Meta:
+#         model = Update_Prescription
+#         fields = '__all__'
+#
+#         widgets = {
+#             'medicine': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Medicine'}),
+#             'dose': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Dosage'}),
+#         }
+
+# from django import forms
+#
+# class ReviewForm(forms.Form):
+#     rating = forms.ChoiceField(choices=((1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5')))
+#     comment = forms.CharField(widget=forms.Textarea(attrs={'rows': 4}))
+
+class ReviewForm(forms.ModelForm):
     class Meta:
-        model = Update_Prescription
-        fields = '__all__'
-
-        widgets = {
-            'medicine': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Medicine'}),
-            'dose': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Dosage'}),
-        }
-
+        model = Review
+        fields = ['service', 'comment', 'rate']

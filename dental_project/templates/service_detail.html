@@ -1,0 +1,16 @@
+
+<!-- service_detail.html -->
+<h2>{{ service. ser_name }}</h2>
+<p>{{ service.ser_description }}</p>
+
+<!-- Display reviews -->
+{% for review in reviews %}
+  <div>
+    <p>Rating: {{ review.rating }}</p>
+    <p>Comment: {{ review.comment }}</p>
+    <p>By: {{ review.user.username }}</p>
+    <hr>
+  </div>
+{% empty %}
+  <p>No reviews yet.</p>
+{% endfor %}
