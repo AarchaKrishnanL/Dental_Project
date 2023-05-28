@@ -55,6 +55,8 @@ urlpatterns = [
     path('receipt/<int:booking_id>/', views.view_receipt, name='view_receipt'),
     path('doctor_register', views.doctor_register, name='doctor_register'),
     path('<int:id>', views.update_doctor, name='update_doctor'),
+    path('service_reviews_graph', views.service_reviews_graph, name='service_reviews_graph'),
+
     path("__reload__/", include("django_browser_reload.urls")),
     path('edit_prescription/<int:prescription_id>/', views.edit_prescription, name='edit_prescription'),
 path('delete_prescription/<int:prescription_id>/', views.delete_prescription, name='delete_prescription'),

@@ -15,6 +15,11 @@ from django.contrib.auth.models import User, Group
 from django.db.models import Q
 from django.template.loader import render_to_string
 from django.views import View
+
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+from django.shortcuts import render
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
@@ -800,40 +805,6 @@ def delete_prescription(request, prescription_id):
 
 
 
-# def service_detail(request, id):
-#     ser_name = Services.objects.get(id=id)
-#     reviews = Review.objects.filter(service=ser_name)
-#
-#     return render(request, 'service_detail.html', {'service': ser_name, 'reviews': reviews})
-
-# def service_detail(request, id):
-#     service = Services.objects.get(id=id)
-#     reviews = Review.objects.filter(service=service)
-#
-#     return render(request, 'service_detail.html', {'service': service, 'reviews': reviews})
-#
-#
-#
-#
-#
-# def review_rate(request):
-#     if request.method == 'GET':
-#             ser_id = request.GET('ser_id')
-#             ser_name = Services.objects.get(id=ser_id)
-#             comment = request.GET.get('comment')
-#             rate = request.GET.get('rate')
-#             user = request.user
-#             # Create and save the review object
-#             Review(user=user, ser_name=ser_name, rate=rate, comment=comment).save()
-#  # Redirect to the service detail page or show a success message
-#             return redirect('services', id=ser_id)
-#     else:
-#         form = ReviewForm()
-#
-#     return render(request, 'submit_review.html', {'form': form})
-
-#
-#
 def service_detail(request, service_id):
     service = Services.objects.get(pk=service_id)
     if request.method == 'POST':
@@ -853,4 +824,44 @@ def add_review(request):
         review = Review.objects.create(service=service, comment=comment, rate=rate)
 
     return redirect('services')
+
+def service_reviews_graph(request):
+    services = Services.objects.all()
+
+    service_names = []
+    average_ratings = []
+
+    for service in services:
+        reviews = Review.objects.filter(service=service)
+
+        if reviews:
+            total_ratings = sum(review.rate for review in reviews)
+            average_rating = total_ratings / len(reviews)
+        else:
+            average_rating = 0
+
+        service_names.append(service.ser_name)
+        average_ratings.append(average_rating)
+
+    plt.bar(service_names, average_ratings)
+    plt.xlabel('Services')
+    plt.ylabel('Average Rating')
+    plt.title('Average Ratings for Services')
+    plt.ylim(0, 5)
+    plt.xticks(rotation=45)
+
+    # Convert the plot to HTML
+    import io
+    import urllib, base64
+
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format='png')
+    buffer.seek(0)
+    image_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+    buffer.close()
+
+    return render(request, 'service_reviews_graph.html', {'image_base64': image_base64})
+
+    # Specify the file path for saving the chart image
+    # file_path = os.path.join(settings.STATIC_ROOT, 'charts/chart.png')
 
