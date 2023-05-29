@@ -1,7 +1,10 @@
 from django.contrib import admin
+
+from . import views
 from .models import Services, Doctors, Booking, Patients, Appointment, Time_slot, Details_User, Details_Doctor,\
     Patients,Prescription,Review
 from django.contrib.auth.models import Group
+
 # Register your models here.
 
 

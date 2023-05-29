@@ -49,11 +49,12 @@ class Time_slot(models.Model):
 
 
 class Booking(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,null=True,blank=True)
-    doc_name= models.ForeignKey(Doctors,on_delete=models.CASCADE,null=True,blank=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
+    doc_name = models.ForeignKey(Doctors, on_delete=models.CASCADE, null=True, blank=True)
+    service = models.ForeignKey(Services, on_delete=models.CASCADE, null=True, blank=True, related_name='bookings')
     booking_date = models.DateField()
     booked_on = models.DateField(auto_now=True)
-    time_slot = models.ForeignKey(Time_slot, on_delete=models.CASCADE,null=True,blank=True)
+    time_slot = models.ForeignKey(Time_slot, on_delete=models.CASCADE, null=True, blank=True)
     description = models.TextField(blank=True)
 
 

@@ -56,6 +56,7 @@ urlpatterns = [
     path('receipt/<int:booking_id>/', views.view_receipt, name='view_receipt'),
     path('doctor_register', views.doctor_register, name='doctor_register'),
     path('<int:id>', views.update_doctor, name='update_doctor'),
+    path('review_graph_admin', views.review_graph_admin, name='review_graph_admin'),
     path('service_reviews_graph', views.service_reviews_graph, name='service_reviews_graph'),
     path('generate_service_reviews_report', views.generate_service_reviews_report, name='generate_service_reviews_report'),
     path("__reload__/", include("django_browser_reload.urls")),
@@ -79,6 +80,9 @@ path('delete_prescription/<int:prescription_id>/', views.delete_prescription, na
     path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
+
+
+
 
 
 ]

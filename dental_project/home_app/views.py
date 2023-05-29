@@ -873,7 +873,139 @@ import tempfile
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 
+
+from django.db.models import Count, Avg
+from django.http import HttpResponse
+from django.conf import settings
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+import io
+import tempfile
+import os
+
 def generate_service_reviews_report(request):
+    services = Services.objects.annotate(num_bookings=Count('bookings')).all()
+
+    service_names = []
+    average_ratings = []
+    num_bookings = []
+    review_rate_percentages = []
+
+    for service in services:
+        reviews = Review.objects.filter(service=service)
+
+        if reviews:
+            total_ratings = sum(review.rate for review in reviews)
+            average_rating = total_ratings / len(reviews)
+            review_rate = (len(reviews) / service.num_bookings) * 100 if service.num_bookings > 0 else 0
+        else:
+            average_rating = 0
+            review_rate = 0
+
+        service_names.append(service.ser_name)
+        average_ratings.append(average_rating)
+        num_bookings.append(service.num_bookings)
+        review_rate_percentages.append(review_rate)
+
+    plt.bar(service_names, average_ratings)
+    plt.xlabel('Services')
+    plt.ylabel('Average Rating')
+    plt.title('Average Ratings for Services')
+    plt.ylim(0, 5)
+    plt.xticks(rotation=45)
+
+    # Save the plot as an image file
+    with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as temp_file:
+        plt.savefig(temp_file.name)
+
+    # Create a PDF report
+    pdf_buffer = io.BytesIO()
+    canvas_obj = canvas.Canvas(pdf_buffer, pagesize=letter)
+    canvas_obj.drawImage(temp_file.name, 50, 50, width=500, height=300)
+    canvas_obj.showPage()
+
+    # Write the service details to the PDF report
+    canvas_obj.setFont("Helvetica", 12)
+    y = 500
+    line_height = 20
+    for i, service_name in enumerate(service_names):
+        canvas_obj.drawString(50, y, f"Service: {service_name}")
+        canvas_obj.drawString(50, y - line_height, f"Average Rating: {average_ratings[i]:.2f}")
+        canvas_obj.drawString(50, y - line_height * 2, f"Number of Bookings: {num_bookings[i]}")
+        canvas_obj.drawString(50, y - line_height * 3, f"Review Rate Percentage: {review_rate_percentages[i]:.2f}%")
+        canvas_obj.drawString(50, y - line_height * 4, "-----------------------------")
+        y -= line_height * 5
+
+    canvas_obj.save()
+
+    # Close and remove the temporary image file
+    plt.close()
+    os.remove(temp_file.name)
+
+    # Set the response content type as PDF
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="service_reviews_report.pdf"'
+
+    # Write the PDF buffer to the response
+    response.write(pdf_buffer.getvalue())
+    pdf_buffer.close()
+
+    return response
+
+
+
+# def generate_service_reviews_report(request):
+#     services = Services.objects.all()
+#
+#     service_names = []
+#     average_ratings = []
+#
+#     for service in services:
+#         reviews = Review.objects.filter(service=service)
+#
+#         if reviews:
+#             total_ratings = sum(review.rate for review in reviews)
+#             average_rating = total_ratings / len(reviews)
+#         else:
+#             average_rating = 0
+#
+#         service_names.append(service.ser_name)
+#         average_ratings.append(average_rating)
+#
+#     plt.bar(service_names, average_ratings)
+#     plt.xlabel('Services')
+#     plt.ylabel('Average Rating')
+#     plt.title('Average Ratings for Services')
+#     plt.ylim(0, 5)
+#     plt.xticks(rotation=45)
+#
+#     # Save the plot as an image file
+#     with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as temp_file:
+#         plt.savefig(temp_file.name)
+#
+#     # Create a PDF report
+#     pdf_buffer = io.BytesIO()
+#     canvas_obj = canvas.Canvas(pdf_buffer, pagesize=letter)
+#     canvas_obj.drawImage(temp_file.name, 50, 50, width=500, height=300)
+#     canvas_obj.showPage()
+#     canvas_obj.save()
+#
+#     # Close and remove the temporary image file
+#     plt.close()
+#     os.remove(temp_file.name)
+#
+#     # Set the response content type as PDF
+#     response = HttpResponse(content_type='application/pdf')
+#     response['Content-Disposition'] = 'attachment; filename="service_reviews_report.pdf"'
+#
+#     # Write the PDF buffer to the response
+#     response.write(pdf_buffer.getvalue())
+#     pdf_buffer.close()
+#
+#     return response
+
+
+def review_graph_admin(request):
     services = Services.objects.all()
 
     service_names = []
@@ -898,30 +1030,14 @@ def generate_service_reviews_report(request):
     plt.ylim(0, 5)
     plt.xticks(rotation=45)
 
-    # Save the plot as an image file
-    with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as temp_file:
-        plt.savefig(temp_file.name)
+    # Convert the plot to HTML
+    import io
+    import urllib, base64
 
-    # Create a PDF report
-    pdf_buffer = io.BytesIO()
-    canvas_obj = canvas.Canvas(pdf_buffer, pagesize=letter)
-    canvas_obj.drawImage(temp_file.name, 50, 50, width=500, height=300)
-    canvas_obj.showPage()
-    canvas_obj.save()
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format='png')
+    buffer.seek(0)
+    image_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+    buffer.close()
 
-    # Close and remove the temporary image file
-    plt.close()
-    os.remove(temp_file.name)
-
-    # Set the response content type as PDF
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename="service_reviews_report.pdf"'
-
-    # Write the PDF buffer to the response
-    response.write(pdf_buffer.getvalue())
-    pdf_buffer.close()
-
-    return response
-
-
-
+    return render(request, 'review_graph_admin.html', {'image_base64': image_base64})

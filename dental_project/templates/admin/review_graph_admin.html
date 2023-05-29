@@ -1,0 +1,16 @@
+
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Service Reviews Graph</h1>
+
+<img src="data:image/png;base64,{{ image_base64 }}" alt="Service Reviews Graph"><br><br>
+<div>
+               <center> <a href="{% url 'generate_service_reviews_report' %}">
+               <button type="submit" onclick="login" name="submit" class="btn btn-warning ml-auto">
+               Service Reviews Report Download</button> </a></center>
+</div>
+{% endblock %}
+
+
+
